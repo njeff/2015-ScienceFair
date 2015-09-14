@@ -2,7 +2,7 @@ package com.example.jeffrey.camerabackgroundservice;
 
 /**
  * Derived from:
- * http://stackoverflow.com/questions/15975988/what-apis-in-android-is-facebook-using-to-create-chat-heads
+ * http://www.piwai.info/chatheads-basics/
  */
 
 import android.app.Service;
@@ -101,16 +101,15 @@ public class CameraUI extends Service {
     private Camera.FaceDetectionListener faceDetectionListener = new Camera.FaceDetectionListener(){
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera){
-            if(taken == true){
+            if(taken == true){ //if we have the photo
                 Log.d(TAG, "taken!");
+                stopSelf();
             }
             if(faces.length==1){
                 verify++;
                 if(taken == false && verify == 5){
                     mCamera.takePicture(null, null, mPicture);
-                    Log.d(TAG, "GOT PHOTO ---------------------------------------------------------------------------------");
-
-                    stopSelf();
+                    Log.d(TAG, "-------------------------------------- GOT PHOTO --------------------------------------");
                 }
             }
             else {
@@ -126,7 +125,8 @@ public class CameraUI extends Service {
         public void onPictureTaken(byte[] data, Camera camera) {
             //http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
             //save to photos folder on phone
-            Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+            ContentValues val = new ContentValues();
+            Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
 
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
@@ -220,8 +220,10 @@ public class CameraUI extends Service {
 
     @Override
     public void onDestroy(){
-        Log.d(TAG,"destroy");
+        Log.d(TAG, "destroy");
         super.onDestroy();
+        if (mPreview != null) windowManager.removeView(mPreview); //remove camera preview
+        releaseCamera();
     }
 
 }

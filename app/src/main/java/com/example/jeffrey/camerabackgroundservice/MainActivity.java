@@ -1,5 +1,6 @@
 package com.example.jeffrey.camerabackgroundservice;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +23,7 @@ import java.io.IOException;
 
 import static com.example.jeffrey.camerabackgroundservice.CameraService.startActionFoo;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
 
@@ -38,28 +39,11 @@ public class MainActivity extends AppCompatActivity {
 
         faceCount = (TextView) findViewById(R.id.face_count);
         confidence = (TextView) findViewById(R.id.confidence);
-/*
-        LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(KILLSERVICE);
-        bManager.registerReceiver(bReceiver, intentFilter);
-*/
-        final Intent CameraIntent = new Intent(getApplicationContext(), CameraUI.class);
-        startService(CameraIntent); //start photo-taking service
+
+        //final Intent CameraIntent = new Intent(getApplicationContext(), CameraUI.class);
+        //startService(CameraIntent); //start photo-taking service
     }
-/*
-    public static final String KILLSERVICE = "DESTROY_CAMERA_SERVICE";
 
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(KILLSERVICE)) {
-
-                //Do something with the string
-            }
-        }
-    };
-*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
