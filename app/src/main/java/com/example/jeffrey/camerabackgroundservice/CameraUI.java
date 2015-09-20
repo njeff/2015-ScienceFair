@@ -10,17 +10,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +28,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CameraUI extends Service {
     private static final String TAG = "Service";
@@ -82,16 +83,26 @@ public class CameraUI extends Service {
         List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
 
         // Iterate through all available resolutions and choose one.
-        // The chosen resolution will be stored in mSize.
+        /*
         for (Camera.Size size : sizes) {
             Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
-
         }
-        cParams.setPictureSize(sizes.get(0).width,sizes.get(0).height);
+        */
+        cParams.setPictureSize(sizes.get(0).width, sizes.get(0).height); //use largest resolution possible
         mCamera.setParameters(cParams);
 
         mPreview = new CameraPreview(this, mCamera);
         windowManager.addView(mPreview, params);
+
+        TimerTask timestop = new TimerTask() {
+            @Override
+            public void run() {
+                stopSelf();
+            }
+        };
+
+        Timer stopTimer = new Timer();
+        stopTimer.schedule(timestop, 10000); //kill service after 10 seconds if no face is found
     }
 
     private boolean taken = false; //whether or not photo has been taken
@@ -127,12 +138,6 @@ public class CameraUI extends Service {
             //save to photos folder on phone
             ContentValues val = new ContentValues();
             Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
-
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
-                Log.d(TAG, "Error creating media file, check storage permissions: ");
-                return;
-            }
 
             try {
                 OutputStream os = getContentResolver().openOutputStream(uriTarget);
