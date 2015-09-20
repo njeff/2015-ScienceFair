@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -20,7 +21,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,6 +39,19 @@ public class CameraUI extends Service {
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+
+    private int cropheight;
+    private int cropwidth;
+    private int cameraheightres;
+    private int camerawidthres;
+    int l;
+    int t;
+    //right, bottom
+    int r;
+    int b;
+    //center coordinates
+    int cx;
+    int cy;
 
     public CameraUI() {
     }
@@ -88,7 +101,9 @@ public class CameraUI extends Service {
             Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
         }
         */
-        cParams.setPictureSize(sizes.get(0).width, sizes.get(0).height); //use largest resolution possible
+        cameraheightres = sizes.get(0).height;
+        camerawidthres = sizes.get(0).width;
+        cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
         mCamera.setParameters(cParams);
 
         mPreview = new CameraPreview(this, mCamera);
@@ -112,15 +127,34 @@ public class CameraUI extends Service {
     private Camera.FaceDetectionListener faceDetectionListener = new Camera.FaceDetectionListener(){
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera){
-            if(taken == true){ //if we have the photo
+            if(taken == true){
                 Log.d(TAG, "taken!");
                 stopSelf();
             }
+
             if(faces.length==1){
                 verify++;
+
+                l = (1000 + faces[0].rect.left) * camerawidthres / 2000;
+                t = (1000 + faces[0].rect.top) * cameraheightres / 2000;
+                r = (1000 + faces[0].rect.right) * camerawidthres / 2000;
+                b = (1000 + faces[0].rect.bottom) * cameraheightres / 2000;
+                cx = faces[0].rect.centerX();
+                cy = faces[0].rect.centerY();
+
+                cropwidth = r - l;
+                cropheight = b - t;
+        //                Log.d(TAG, "LENGTH: " + String.valueOf(croplength));
+        //                Log.d(TAG, "WIDTH: " + String.valueOf(cropwidth));
+                Log.d(TAG, "L: " + String.valueOf(l) + "/" + camerawidthres);
+                Log.d(TAG, "R: " + String.valueOf(r) + "/" + camerawidthres);
+                Log.d(TAG, "T: " + String.valueOf(t) + "/" + cameraheightres);
+                Log.d(TAG, "B: " + String.valueOf(b) + "/" + cameraheightres);
+
                 if(taken == false && verify == 5){
                     mCamera.takePicture(null, null, mPicture);
-                    Log.d(TAG, "-------------------------------------- GOT PHOTO --------------------------------------");
+                    Log.d(TAG, "GOT PHOTO ---------------------------------------------------------------------------------");
+
                 }
             }
             else {
@@ -150,8 +184,21 @@ public class CameraUI extends Service {
             } catch (IOException e) {
                 Log.d(TAG, "Error accessing file: " + e.getMessage());
             }
+
+            Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            cropPicture(originalbitmap);
         }
     };
+
+    public void cropPicture(Bitmap originalbitmap) {
+        Matrix matrix = new Matrix();
+        matrix.postScale(0.5f, 0.5f);
+        matrix.postRotate(-90);
+        Bitmap croppedbitmap = Bitmap.createBitmap(originalbitmap, l, t, cropwidth, cropheight, matrix, true);
+        ContentValues val = new ContentValues();
+        Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
+        MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A" , null);
+    }
 
     //check for camera
     private boolean checkCameraHardware(Context context) {
