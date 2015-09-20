@@ -18,13 +18,9 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,8 +28,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CameraUI extends Service {
     private static final String TAG = "Service";
@@ -43,6 +39,7 @@ public class CameraUI extends Service {
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+
     private int cropheight;
     private int cropwidth;
     private int cameraheightres;
@@ -99,18 +96,28 @@ public class CameraUI extends Service {
         List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
 
         // Iterate through all available resolutions and choose one.
-        // The chosen resolution will be stored in mSize.
+        /*
         for (Camera.Size size : sizes) {
             Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
-
         }
+        */
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
-        cParams.setPictureSize(camerawidthres,cameraheightres);
+        cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
         mCamera.setParameters(cParams);
 
         mPreview = new CameraPreview(this, mCamera);
         windowManager.addView(mPreview, params);
+
+        TimerTask timestop = new TimerTask() {
+            @Override
+            public void run() {
+                stopSelf();
+            }
+        };
+
+        Timer stopTimer = new Timer();
+        stopTimer.schedule(timestop, 10000); //kill service after 10 seconds if no face is found
     }
 
     private boolean taken = false; //whether or not photo has been taken
@@ -118,32 +125,8 @@ public class CameraUI extends Service {
 
     //face detection listener
     private Camera.FaceDetectionListener faceDetectionListener = new Camera.FaceDetectionListener(){
-//        @Override
-//        public void onFaceDetection(Camera.Face[] faces, Camera camera){
-//            if(taken == true){ //if we have the photo
-//                Log.d(TAG, "taken!");
-//                stopSelf();
-//            }
-//            if(faces.length==1){
-//                verify++;
-//                if(taken == false && verify == 5){
-//                    mCamera.takePicture(null, null, mPicture);
-//                    Log.d(TAG, "-------------------------------------- GOT PHOTO --------------------------------------");
-//                }
-//            }
-//            else {
-//                verify = 0;
-//            }
-//            Log.d(TAG, Integer.toString(faces.length));
-//        }
-//    };
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera){
-
-
-        //            int vWidth = preview.getWidth();
-        //            int vHeight = preview.getHeight();
-
             if(taken == true){
                 Log.d(TAG, "taken!");
                 stopSelf();
@@ -177,29 +160,7 @@ public class CameraUI extends Service {
             else {
                 verify = 0;
             }
-        //            if (faces.length==1 && taken == false){
-        //                verify++;
-        //                for (int i = 0; i < 5; i++){
-        //
-        //            mCamera.takePicture(null, null, mPicture);
-        //
-        //                    Log.d(TAG, "GOT PHOTO ---------------------------------------------------------------------------------");
-        //                    try {
-        //                        //sending the actual Thread of execution to sleep X milliseconds
-        //                        Thread.sleep(3000);
-        //                    } catch(InterruptedException ie) {
-        //
-        //                    }
-        //
-        //
-        //                }
-        //                taken = true; //set flag - photo has been taken
-        //            }
-        //            else {
-        //                verify = 0;
-        //            }
             Log.d(TAG, Integer.toString(faces.length));
-
         }
     };
 
@@ -211,12 +172,6 @@ public class CameraUI extends Service {
             //save to photos folder on phone
             ContentValues val = new ContentValues();
             Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
-
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
-                Log.d(TAG, "Error creating media file, check storage permissions: ");
-                return;
-            }
 
             try {
                 OutputStream os = getContentResolver().openOutputStream(uriTarget);
@@ -243,17 +198,6 @@ public class CameraUI extends Service {
         ContentValues val = new ContentValues();
         Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
         MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A" , null);
-
-//        try {
-//                OutputStream os = getContentResolver().openOutputStream(seconduriTarget);
-//                croppedbitmap.compress(Bitmap.CompressFormat.JPEG, 1)
-//                os.write(croppedbitmap);
-//                os.flush();
-//                os.close();
-//                taken = true; //set flag - photo has been taken
-//            } catch (FileNotFoundException e) {
-//                Log.d(TAG, "File not found: " + e.getMessage());
-//            }
     }
 
     //check for camera
