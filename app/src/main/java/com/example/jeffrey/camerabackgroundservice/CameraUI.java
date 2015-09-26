@@ -16,6 +16,7 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -36,9 +37,6 @@ public class CameraUI extends Service {
     private WindowManager windowManager;
     private Camera mCamera;
     private CameraPreview mPreview;
-
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
 
     private int cropheight;
     private int cropwidth;
@@ -170,23 +168,27 @@ public class CameraUI extends Service {
         public void onPictureTaken(byte[] data, Camera camera) {
             //http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
             //save to photos folder on phone
-            ContentValues val = new ContentValues();
-            Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
+            if(SD.hasStorage(true)) {
+                SD.saveImage(data);
+            } else {
+                ContentValues val = new ContentValues();
+                Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
 
-            try {
-                OutputStream os = getContentResolver().openOutputStream(uriTarget);
-                os.write(data);
-                os.flush();
-                os.close();
-                taken = true; //set flag - photo has been taken
-            } catch (FileNotFoundException e) {
-                Log.d(TAG, "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "Error accessing file: " + e.getMessage());
+                try {
+                    OutputStream os = getContentResolver().openOutputStream(uriTarget);
+                    os.write(data);
+                    os.flush();
+                    os.close();
+                    taken = true; //set flag - photo has been taken
+                } catch (FileNotFoundException e) {
+                    Log.d(TAG, "File not found: " + e.getMessage());
+                } catch (IOException e) {
+                    Log.d(TAG, "Error accessing file: " + e.getMessage());
+                }
+
+                Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                cropPicture(originalbitmap);
             }
-
-            Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            cropPicture(originalbitmap);
         }
     };
 
@@ -236,38 +238,6 @@ public class CameraUI extends Service {
             mCamera.release();
             mCamera = null;
         }
-    }
-
-    private File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(getFilesDir(), "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
     }
 
     @Override
