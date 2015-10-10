@@ -152,7 +152,6 @@ public class CameraUI extends Service {
                 if(taken == false && verify == 5){
                     mCamera.takePicture(null, null, mPicture);
                     Log.d(TAG, "GOT PHOTO ---------------------------------------------------------------------------------");
-
                 }
             }
             else {
@@ -168,8 +167,11 @@ public class CameraUI extends Service {
         public void onPictureTaken(byte[] data, Camera camera) {
             //http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
             //save to photos folder on phone
+            Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             if(SD.hasStorage(true)) {
                 SD.saveImage(data);
+                cropPicture(originalbitmap, true);
+                taken = true;
             } else {
                 ContentValues val = new ContentValues();
                 Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
@@ -179,30 +181,41 @@ public class CameraUI extends Service {
                     os.write(data);
                     os.flush();
                     os.close();
+                    cropPicture(originalbitmap,false);
                     taken = true; //set flag - photo has been taken
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found: " + e.getMessage());
                 } catch (IOException e) {
                     Log.d(TAG, "Error accessing file: " + e.getMessage());
                 }
-
-                Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                cropPicture(originalbitmap);
             }
         }
     };
 
-    public void cropPicture(Bitmap originalbitmap) {
+    /**
+     * Crop image to face
+     * @param originalbitmap
+     * @param SDv
+     */
+    public void cropPicture(Bitmap originalbitmap, boolean SDv) {
         Matrix matrix = new Matrix();
         matrix.postScale(0.5f, 0.5f);
         matrix.postRotate(-90);
         Bitmap croppedbitmap = Bitmap.createBitmap(originalbitmap, l, t, cropwidth, cropheight, matrix, true);
-        ContentValues val = new ContentValues();
-        Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
-        MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A" , null);
+        if(SDv){
+            SD.saveImage(croppedbitmap);
+        } else {
+            ContentValues val = new ContentValues();
+            Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
+            MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A", null);
+        }
     }
 
-    //check for camera
+    /**
+     * Check for camera
+     * @param context
+     * @return
+     */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
             // this device has a camera
@@ -214,7 +227,10 @@ public class CameraUI extends Service {
         }
     }
 
-    //find front facing camera
+    /**
+     * Find front facing camera
+     * @return
+     */
     private int findFrontFacingCamera() {
         int cameraId = -1;
         // Search for the front facing camera
@@ -231,7 +247,9 @@ public class CameraUI extends Service {
         return cameraId;
     }
 
-    //release camera
+    /**
+     * Release camera
+     */
     private void releaseCamera() {
         if (mCamera != null) {
             mCamera.stopPreview();
