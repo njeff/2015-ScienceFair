@@ -4,4 +4,7 @@
     <string name="action_about">About</string>
     <string name="description">Creates a service that launches on every unlock that takes a picture of the user.
         \n\nService is automatically destroyed after 10 seconds if no face is detected.</string>
+    <string name="title_activity_cvface_detect">CVFaceDetect</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

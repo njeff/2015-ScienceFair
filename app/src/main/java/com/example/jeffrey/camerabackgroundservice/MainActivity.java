@@ -14,6 +14,11 @@ import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 
 

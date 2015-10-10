@@ -7,9 +7,7 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -28,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".ScreenReceiver">
+        <receiver android:name=".ScreenReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
@@ -43,6 +41,15 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name="OpenCV.detect.CVFaceDetect"
+            android:label="@string/title_activity_cvface_detect"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.jeffrey.camerabackgroundservice.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
