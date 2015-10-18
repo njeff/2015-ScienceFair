@@ -1,19 +1,14 @@
-package com.example.jeffrey.camerabackgroundservice;
+package com.sci2015fair.service;
 
 import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
-
-import java.io.IOException;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in

@@ -1,4 +1,4 @@
-package com.example.jeffrey.camerabackgroundservice;
+package com.sci2015fair.service;
 
 /**
  * Derived from:
@@ -16,18 +16,15 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
-import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;

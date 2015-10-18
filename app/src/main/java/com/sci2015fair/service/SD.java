@@ -1,4 +1,4 @@
-package com.example.jeffrey.camerabackgroundservice;
+package com.sci2015fair.service;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
