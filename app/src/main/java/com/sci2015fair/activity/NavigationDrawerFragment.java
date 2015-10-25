@@ -1,12 +1,14 @@
 package com.sci2015fair.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -53,10 +55,10 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    private ListView mDrawerListView;//view containing side bar listed sections
     private View mFragmentContainerView;
 
-    private int mCurrentSelectedPosition = 0;
+    private int mCurrentSelectedPosition = 0;//value containing coordinates of user "taps" (selections)
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
@@ -103,10 +105,14 @@ public class NavigationDrawerFragment extends Fragment {
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                new String[]{
+                new String[]{//array containing strings of buttons in the side drawer navigator
+                        getString(R.string.title_section0),
                         getString(R.string.title_section1),
                         getString(R.string.title_section2),
                         getString(R.string.title_section3),
+                        getString(R.string.title_section4),
+                        getString(R.string.title_section5),
+
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -194,6 +200,7 @@ public class NavigationDrawerFragment extends Fragment {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
+
         }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
@@ -201,6 +208,31 @@ public class NavigationDrawerFragment extends Fragment {
         if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
+        Fragment selectedFragment = null;//any fragment assigned in the switch statement below will be opened in the "if" statement after it
+        switch (position) {//fragments are assigned based on the matching of the position of the section titles created in a string array in the method "onCreateView"
+            case 0: selectedFragment = new HomeFragment();//array value 0, opens fragment in "HomeFragment.java"
+                break;
+            case 1: selectedFragment = new StatsSummaryFragment();
+                break;
+            case 2: selectedFragment = new ConsoleLogFragment();
+                break;
+            case 3: selectedFragment = new ItemFragment();
+                break;
+            case 5: selectedFragment = new SettingsFragment();//array value 4, opens fragment SettingsFragment
+                break;
+            default://if a listed title does not have a fragment assigned to it, no new fragment will be opened
+                break;
+
+        }
+        if (selectedFragment != null) {//"if" statement is just a safeguard in the event that a button is not assigned to a case in the switch above, and a fragment is therefore not assigned
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, selectedFragment)
+                    .commit();
+        } else {
+
+        }
+
     }
 
     @Override
@@ -244,7 +276,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {//menuitem refers to the menu bar
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -265,7 +297,7 @@ public class NavigationDrawerFragment extends Fragment {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setTitle(R.string.app_name);
+        actionBar.setTitle(R.string.app_name);//default app name
     }
 
     private ActionBar getActionBar() {
@@ -275,10 +307,11 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         /**
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+
     }
 }

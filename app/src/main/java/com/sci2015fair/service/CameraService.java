@@ -17,6 +17,11 @@ import android.view.View;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
+
+
+/**
+ * The class that actually contains the programmed behavior of the automated service to start the camera.
+ */
 public class CameraService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS

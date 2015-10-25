@@ -2,6 +2,7 @@ package com.sci2015fair.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -17,7 +18,11 @@ import android.view.ViewGroup;
 import com.example.jeffrey.camerabackgroundservice.R;
 import com.sci2015fair.service.CameraUI;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        SettingsFragment.OnFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener,
+        ItemFragment.OnFragmentInteractionListener, StatsSummaryFragment.OnFragmentInteractionListener,
+        AboutThisAppFragment.OnFragmentInteractionListener, AboutUsFragment.OnFragmentInteractionListener,
+        ConsoleLogFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "MainActivity";
     
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, PlaceholderFragment.newInstance(position))
                 .commit();
     }
 
@@ -60,8 +65,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         super.onResume();
     }
 
-    public void onSectionAttached(int number) {
+    public void onSectionAttached(int number) {//method sets title in the toolbar to the name of the fragment selected in the sidenavigator
         switch (number) {
+            case 0:
+                mTitle = getString(R.string.title_section0);
+                break;
             case 1:
                 mTitle = getString(R.string.title_section1);
                 break;
@@ -70,6 +78,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
                 break;
         }
     }
@@ -110,6 +124,16 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     }
 
     @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
+
+    @Override
     public void onPause()
     {
         super.onPause();
@@ -121,12 +145,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         super.onDestroy();
         stopService(new Intent(getApplicationContext(), CameraUI.class));
     }
-
-
-
-
-
-
 
 
 
@@ -164,9 +182,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         }
 
         @Override
-        public void onAttach(Activity activity) {
+        public void onAttach(Activity activity) {//called once a fragment is associated with this activity (MainActivity)
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
+            ((MainActivity) activity).onSectionAttached(//calls method onSectionAttached to set toolbar title (see method comments for more info)
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }

@@ -5,6 +5,9 @@ package com.sci2015fair.service;
  * http://www.piwai.info/chatheads-basics/
  */
 
+/**
+ * handles the detection of faces in 
+ */
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
