@@ -1,12 +1,11 @@
 package com.sci2015fair.service;
 
 /**
+ * The service that is automatically called when the phone is unlocked
+ * Takes a photo of the user
+ *
  * Derived from:
  * http://www.piwai.info/chatheads-basics/
- */
-
-/**
- * handles the detection of faces in 
  */
 import android.app.Service;
 import android.content.ContentValues;
@@ -38,10 +37,7 @@ public class CameraUI extends Service {
     private Camera mCamera;
     private CameraPreview mPreview;
 
-    private int cropheight;
-    private int cropwidth;
-    private int cameraheightres;
-    private int camerawidthres;
+    private int cropheight, cropwidth, cameraheightres, camerawidthres;
     int l;
     int t;
     //right, bottom

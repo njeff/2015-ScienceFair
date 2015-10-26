@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Handles saving photos
+ *
  * Created by Jeffrey on 9/26/2015.
  */
 public class SD {
