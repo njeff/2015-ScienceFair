@@ -18,11 +18,7 @@ import android.view.ViewGroup;
 import com.example.jeffrey.camerabackgroundservice.R;
 import com.sci2015fair.service.CameraUI;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        SettingsFragment.OnFragmentInteractionListener, HomeFragment.OnFragmentInteractionListener,
-        ItemFragment.OnFragmentInteractionListener, StatsSummaryFragment.OnFragmentInteractionListener,
-        AboutThisAppFragment.OnFragmentInteractionListener, AboutUsFragment.OnFragmentInteractionListener,
-        ConsoleLogFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 
     private static final String TAG = "MainActivity";
     
@@ -122,16 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onFragmentInteraction(String id) {
-
-    }
+    
 
     @Override
     public void onPause()

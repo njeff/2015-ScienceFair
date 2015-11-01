@@ -47,9 +47,6 @@ public class CameraUI extends Service {
     int cx;
     int cy;
 
-    public CameraUI() {
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
@@ -210,7 +207,7 @@ public class CameraUI extends Service {
     /**
      * Check for camera
      * @param context
-     * @return
+     * @return if camera exists
      */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
@@ -225,7 +222,7 @@ public class CameraUI extends Service {
 
     /**
      * Find front facing camera
-     * @return
+     * @return camera id of front facing camera
      */
     private int findFrontFacingCamera() {
         int cameraId = -1;
