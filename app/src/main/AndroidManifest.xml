@@ -55,6 +55,12 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <service
+            android:name="com.sci2015fair.opencv.Classify"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

@@ -227,7 +227,7 @@ public class CameraService extends Service {
     /**
      * Check for camera
      * @param context
-     * @return
+     * @return if camera exists
      */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
@@ -242,7 +242,7 @@ public class CameraService extends Service {
 
     /**
      * Find front facing camera
-     * @return
+     * @return camera id of front facing camera
      */
     private int findFrontFacingCamera() {
         int cameraId = -1;

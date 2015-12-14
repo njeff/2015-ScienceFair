@@ -6,7 +6,6 @@ import android.content.Intent;
 
 import com.sci2015fair.activity.ItemFragment;
 import com.sci2015fair.activity.MainActivity;
-import com.sci2015fair.activity.Notifications;
 
 /**
  * Created by Jeffrey on 9/6/2015.
