@@ -11,6 +11,7 @@ import java.io.IOException;
 /** A basic Camera preview class
  * Detects changes in the surface and appropriately handles the camera preview
  *
+ * 12/13/2015 - renamed from CameraUI to CameraService by Mitchell Wu.
  * */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;

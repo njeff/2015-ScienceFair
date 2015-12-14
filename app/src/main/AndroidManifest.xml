@@ -38,18 +38,23 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.sci2015fair.service.ScreenReceiver" >
+        <receiver android:name="com.sci2015fair.service.CameraServiceStarter" >
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name="com.sci2015fair.service.CameraUI"
+            android:name="com.sci2015fair.service.CameraService"
             android:enabled="true"
             android:exported="true" >
         </service>
 
+        <service
+            android:name="com.sci2015fair.service.Notifications"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
