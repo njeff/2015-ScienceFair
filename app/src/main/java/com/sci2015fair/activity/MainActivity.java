@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.opencv.Classify;
 import com.sci2015fair.service.CameraUI;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
+
 
     private static final String TAG = "MainActivity";
     
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Log.d("a",stringFromJNI());
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -119,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void onPause()
     {
@@ -132,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         super.onDestroy();
         stopService(new Intent(getApplicationContext(), CameraUI.class));
     }
-
-
 
 
     /**
@@ -174,5 +177,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             ((MainActivity) activity).onSectionAttached(//calls method onSectionAttached to set toolbar title (see method comments for more info)
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
+    }
+
+    static {
+        //System.loadLibrary("jni_stasm");
     }
 }

@@ -5,12 +5,20 @@ android {
     buildToolsVersion '23.0.0 rc3'
 
     defaultConfig {
-        applicationId "com.example.jeffrey.camerabackgroundservice"
+        applicationId "com.sci2015fair"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        ndk {
+            moduleName "jni_stasm"
+            stl "stlport_shared"
+            cFlags "-fexceptions -I " + "C:\\Users\\Jeffrey\\Documents\\SciFair2015-2016\\android-ndk-r10e\\sources\\cxx-stl\\gnu-libstdc++\\4.9\\include"
+        }
     }
+
+    sourceSets.main.jni.srcDirs = []
+
     buildTypes {
         release {
             minifyEnabled false
@@ -25,4 +33,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.google.android.gms:play-services:7.8.0'
     compile 'com.android.support:support-v4:23.0.1'
+    compile files('libs/libsvm.jar')
 }

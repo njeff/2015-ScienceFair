@@ -30,6 +30,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import libsvm.*;
+
 /**
  * Service to classify photos using OpenCV
  */
@@ -75,10 +77,13 @@ public class Classify extends Service {
                 mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
             }
 
-            File root = Environment.getExternalStorageDirectory(); //get root of visible storage directory
+            /*
+            File root = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES), "2015-ScienceFair"); //get root of image directory
+
             Mat image = new Mat();
             try {
-                FileInputStream fis = new FileInputStream(new File(root, "Pictures/2015-ScienceFair/IMG_20151005_141009b.jpg")); //get image
+                FileInputStream fis = new FileInputStream(new File(root, "IMG_20151005_141009b.jpg")); //get image
                 Bitmap bitmap = BitmapFactory.decodeStream(fis);
                 Utils.bitmapToMat(bitmap, image); //convert to Mat
                 fis.close();
@@ -87,9 +92,9 @@ public class Classify extends Service {
             }
 
             // load cascade file from application resources
-            InputStream is = getResources().openRawResource(R.raw.lbpcascade_frontalface);
+            InputStream is = getResources().openRawResource(R.raw.haar_leye);
             File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-            File mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
+            File mCascadeFile = new File(cascadeDir, "haar_leye.xml");
             FileOutputStream os = null;
             try {
                 os = new FileOutputStream(mCascadeFile);
@@ -117,12 +122,16 @@ public class Classify extends Service {
             MatOfRect faceDectections = new MatOfRect(); //array to hold info on detected faces
             faceDetector.detectMultiScale(image, faceDectections); //detect faces
 
-            Log.d("FACE",String.format("Detected %d faces:", faceDectections.toArray().length));
+            Log.d("FACE",String.format("Detected %d faces", faceDectections.toArray().length));
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
+            */
+
+
             stopSelf(msg.arg1);
         }
     }
+
 
     @Override
     public void onCreate() {
@@ -141,7 +150,7 @@ public class Classify extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "OCV Starting", Toast.LENGTH_SHORT).show();
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job

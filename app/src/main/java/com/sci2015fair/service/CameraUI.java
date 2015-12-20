@@ -14,25 +14,42 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
+
+import com.google.android.gms.vision.face.Landmark;
+import com.sci2015fair.opencv.Classify;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CameraUI extends Service {
-    private static final String TAG = "Service";
+    private static final String TAG = "CamServ";
     private WindowManager windowManager;
     private Camera mCamera;
     private CameraPreview mPreview;
@@ -86,12 +103,6 @@ public class CameraUI extends Service {
         cParams.setJpegQuality(100);
         List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
 
-        // Iterate through all available resolutions and choose one.
-        /*
-        for (Camera.Size size : sizes) {
-            Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
-        }
-        */
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
@@ -142,7 +153,7 @@ public class CameraUI extends Service {
                 Log.d(TAG, "T: " + String.valueOf(t) + "/" + cameraheightres);
                 Log.d(TAG, "B: " + String.valueOf(b) + "/" + cameraheightres);
 
-                if(taken == false && verify == 5){
+                if(taken == false && verify == 3){
                     mCamera.takePicture(null, null, mPicture);
                     Log.d(TAG, "GOT PHOTO ---------------------------------------------------------------------------------");
                 }
@@ -161,12 +172,13 @@ public class CameraUI extends Service {
             //http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
             //save to photos folder on phone
             Bitmap originalbitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
             if(SD.hasStorage(true)) {
-                SD.saveImage(data);
+                SD.saveImage(data); //save to SD card (doesn't work properly yet)
                 cropPicture(originalbitmap, true);
                 taken = true;
             } else {
-                ContentValues val = new ContentValues();
+                ContentValues val = new ContentValues(); //save to android mediastore
                 Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
 
                 try {
@@ -192,9 +204,58 @@ public class CameraUI extends Service {
      */
     public void cropPicture(Bitmap originalbitmap, boolean SDv) {
         Matrix matrix = new Matrix();
-        matrix.postScale(0.5f, 0.5f);
-        matrix.postRotate(-90);
-        Bitmap croppedbitmap = Bitmap.createBitmap(originalbitmap, l, t, cropwidth, cropheight, matrix, true);
+        matrix.setRotate(-90);
+        matrix.postScale(0.75f, 0.75f);
+        Bitmap croppedbitmap = Bitmap.createBitmap(originalbitmap, l, t, cropheight, cropwidth, matrix, true);
+
+        FaceDetector detector = new FaceDetector.Builder(getApplicationContext())
+                .setTrackingEnabled(false)
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .build();
+
+        Frame frame = new Frame.Builder().setBitmap(croppedbitmap).build();
+        SparseArray<Face> faces = detector.detect(frame);
+
+        croppedbitmap = convertToMutable(croppedbitmap);
+        Canvas can = new Canvas(croppedbitmap);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+
+        Log.d(TAG, "Number of Faces: " + faces.size());
+        /*
+        for (int i = 0; i < faces.size(); ++i) {
+            Face face = faces.valueAt(i);
+            Log.d(TAG,"LE: "+face.getIsLeftEyeOpenProbability()+" RE: "+face.getIsRightEyeOpenProbability()+" SP: "+face.getIsSmilingProbability());
+
+
+            for (Landmark landmark : face.getLandmarks()) {
+                int cx = (int) (landmark.getPosition().x);
+                int cy = (int) (landmark.getPosition().y);
+                paint.setARGB(255, 50, 50, 255);
+                can.drawCircle(cx, cy, 2, paint);
+            }
+            double yaxis = face.getEulerY();
+
+            float righteyeX = face.getLandmarks().get(0).getPosition().x;
+            float lefteyeX = face.getLandmarks().get(1).getPosition().x;
+            float dist = (righteyeX-lefteyeX)/(float)Math.cos(yaxis); //scale if face is rotated
+            float righteyeY = face.getLandmarks().get(0).getPosition().y;
+            float lefteyeY = face.getLandmarks().get(1).getPosition().y;
+            can.drawRect(righteyeX-dist/3,righteyeY+dist/4,righteyeX+dist/3,righteyeY-dist/4,paint); //box right eye
+            can.drawRect(lefteyeX-dist/3,lefteyeY+dist/4,lefteyeX+dist/3,lefteyeY-dist/4,paint); //box left eye
+
+            float nosebaseX = face.getLandmarks().get(2).getPosition().x;
+            float nosebaseY = face.getLandmarks().get(2).getPosition().y;
+            float mouthtop = nosebaseY-dist/4;
+            can.drawRect(nosebaseX-dist/2,mouthtop,nosebaseX+dist/2,mouthtop-dist*3/5,paint); //box mouth
+        }
+        */
+        detector.release();
+
         if(SDv){
             SD.saveImage(croppedbitmap);
         } else {
@@ -241,6 +302,60 @@ public class CameraUI extends Service {
     }
 
     /**
+     * Converts a immutable bitmap to a mutable bitmap. This operation doesn't allocates
+     * more memory that there is already allocated.
+     * From: http://stackoverflow.com/questions/4349075/bitmapfactory-decoderesource-returns-a-mutable-bitmap-in-android-2-2-and-an-immu
+     *
+     * @param imgIn - Source image. It will be released, and should not be used more
+     * @return a copy of imgIn, but mutable.
+     */
+    public static Bitmap convertToMutable(Bitmap imgIn) {
+        try {
+            //this is the file going to use temporally to save the bytes.
+            // This file will not be a image, it will store the raw image data.
+            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "temp.tmp");
+
+            //Open an RandomAccessFile
+            //Make sure you have added uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            //into AndroidManifest.xml file
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+            // get the width and height of the source bitmap.
+            int width = imgIn.getWidth();
+            int height = imgIn.getHeight();
+            Bitmap.Config type = imgIn.getConfig();
+
+            //Copy the byte to the file
+            //Assume source bitmap loaded using options.inPreferredConfig = Config.ARGB_8888;
+            FileChannel channel = randomAccessFile.getChannel();
+            MappedByteBuffer map = channel.map(FileChannel.MapMode.READ_WRITE, 0, imgIn.getRowBytes()*height);
+            imgIn.copyPixelsToBuffer(map);
+            //recycle the source bitmap, this will be no longer used.
+            imgIn.recycle();
+            System.gc();// try to force the bytes from the imgIn to be released
+
+            //Create a new bitmap to load the bitmap again. Probably the memory will be available.
+            imgIn = Bitmap.createBitmap(width, height, type);
+            map.position(0);
+            //load it back from temporary
+            imgIn.copyPixelsFromBuffer(map);
+            //close the temporary file and channel , then delete that also
+            channel.close();
+            randomAccessFile.close();
+
+            // delete the temp file
+            file.delete();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return imgIn;
+    }
+
+    /**
      * Release camera
      */
     private void releaseCamera() {
@@ -253,10 +368,10 @@ public class CameraUI extends Service {
 
     @Override
     public void onDestroy(){
+        //startService(new Intent(getApplicationContext(), Classify.class)); //launch OpenCV classifier
         Log.d(TAG, "destroy");
         super.onDestroy();
         if (mPreview != null) windowManager.removeView(mPreview); //remove camera preview
         releaseCamera();
     }
-
 }
