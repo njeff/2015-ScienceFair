@@ -16,9 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 import com.sci2015fair.opencv.Classify;
-import com.sci2015fair.service.CameraUI;
+
+import com.sci2015fair.service.CameraService;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
     }
 
     @Override
@@ -109,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         }
         return super.onCreateOptionsMenu(menu);
     }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //Fragment Interfaces
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -125,6 +128,19 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         return super.onOptionsItemSelected(item);
     }
 
+
+//    @Override
+//    public void onConsoleLogFragmentInteraction(Uri uri) {
+//
+//    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //Notification System
+   // @Override
+    public void onClick(View v) {// on click method used
+
+    }
+
     @Override
     public void onPause()
     {
@@ -135,10 +151,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     public void onDestroy()
     {
         super.onDestroy();
-        stopService(new Intent(getApplicationContext(), CameraUI.class));
+        stopService(new Intent(getApplicationContext(), CameraService.class));
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -177,9 +194,5 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
             ((MainActivity) activity).onSectionAttached(//calls method onSectionAttached to set toolbar title (see method comments for more info)
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
-    }
-
-    static {
-        //System.loadLibrary("jni_stasm");
     }
 }

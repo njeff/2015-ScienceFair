@@ -15,7 +15,7 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;

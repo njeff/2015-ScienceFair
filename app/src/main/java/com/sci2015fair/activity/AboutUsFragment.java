@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 
 /**
  * A simple {@link Fragment} subclass.

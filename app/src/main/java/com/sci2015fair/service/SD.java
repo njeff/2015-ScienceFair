@@ -1,6 +1,11 @@
 package com.sci2015fair.service;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -72,13 +77,17 @@ public class SD {
         } catch (IOException e) {
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
+        Intent intent =//rescan MTP directory; this code is still not working to our knowledge (2015.11.14-15), need to figure out how to utilize the sendBroadcast() method.
+                new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(pictureFile));
+//        sendBroadcast(intent);
     }
 
     /**
      * Save bitmap
      * @param image
      */
-    static public void saveImage(Bitmap image){
+    static public void saveImage(Bitmap image, int cropwidth, int cropheight){
         File pictureFile = getOutputMediaFile(MEDIA_TYPE_BITM);
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
@@ -96,6 +105,17 @@ public class SD {
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
     }
+
+//    public static Bitmap combineImages(Bitmap image, int cropwidth, int cropheight) {
+//        Bitmap dotlayer = new Bitmap(cropwidth, cropheight);
+//        Canvas canvas = new Canvas(croppedbitmap);                 //draw a canvas in defined bmp
+//        Paint paint = new Paint();                          //define paint and paint color
+//        paint.setColor(Color.RED);
+//        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+//        //paint.setStrokeWidth(0.5f);
+//        paint.setAntiAlias(true);
+//        canvas.drawCircle(50, 50, 3, paint);
+//    }
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_BITM = 2;

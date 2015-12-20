@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 import com.sci2015fair.activity.dummy.DummyContent;
 
 /**

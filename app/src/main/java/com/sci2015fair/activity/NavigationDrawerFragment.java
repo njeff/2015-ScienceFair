@@ -25,7 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.

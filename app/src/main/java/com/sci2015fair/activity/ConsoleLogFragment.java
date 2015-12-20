@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.jeffrey.camerabackgroundservice.R;
+import com.sci2015fair.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,7 +72,7 @@ public class ConsoleLogFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onConsoleLogFragmentInteraction(uri);
         }
     }
 
@@ -99,7 +99,7 @@ public class ConsoleLogFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onConsoleLogFragmentInteraction(Uri uri);
     }
 
 }
