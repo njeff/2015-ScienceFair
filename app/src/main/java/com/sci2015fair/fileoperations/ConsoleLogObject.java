@@ -1,4 +1,4 @@
-package com.sci2015fair.csvlog;
+package com.sci2015fair.fileoperations;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -7,14 +7,14 @@ import java.util.Date;
 /**
  * Created by Mitchell on 10/31/2015.
  */
-public class ConsoleLogPOJO {
+public class ConsoleLogObject {
     long id;
     private String date;
     private String time;
     private String outputmessagecategory;
     private String mainoutputstring;
 
-    public ConsoleLogPOJO(long id, String outputmessagecategory, String mainoutputstring) {
+    public ConsoleLogObject(long id, String outputmessagecategory, String mainoutputstring) {
         this.id = id;
         this.date = setDate();
         this.time = setTime();

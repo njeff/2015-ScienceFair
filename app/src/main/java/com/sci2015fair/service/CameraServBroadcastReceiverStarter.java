@@ -12,10 +12,10 @@ import com.sci2015fair.activity.MainActivity;
  * Starts the camera service (CameraService) as soon as the phone is turned on and unlocked.
  * Activated by call in AndroidManifest.
  *
- * 12/13/2015 - renamed from ScreenReceiver to CameraServiceStarter by Mitchell Wu.
+ * 12/13/2015 - renamed from ScreenReceiver to CameraServBroadcastReceiverStarter by Mitchell Wu.
  */
 
-public class CameraServiceStarter extends BroadcastReceiver{
+public class CameraServBroadcastReceiverStarter extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent){
         System.out.println(intent.getAction());
@@ -23,8 +23,8 @@ public class CameraServiceStarter extends BroadcastReceiver{
                 intent.getAction().equals(Intent.ACTION_USER_PRESENT))//have we logged in?
         {
 //            Intent camServ = new Intent(context, com.sci2015fair.service.Notifications.class);//create intent
-            Intent camServ = new Intent(context, CameraService.class);//create intent
-            context.startService(camServ);//start CameraService
+//            Intent camServ = new Intent(context, CameraService.class);//create intent
+//            context.startService(camServ);//start CameraService
 
 //            camServ.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            context.startActivity(camServ);

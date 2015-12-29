@@ -1,10 +1,13 @@
-package com.sci2015fair.service;
+package com.sci2015fair.fileoperations;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -21,7 +24,8 @@ import java.util.Date;
  *
  * Created by Jeffrey on 9/26/2015.
  */
-public class SD {
+public class CameraSavePicturesService {
+
     static final String TAG = "sd";
     //http://stackoverflow.com/questions/902089/how-to-tell-if-the-sdcard-is-mounted-in-android
     static public boolean hasStorage(boolean requireWriteAccess) {
@@ -61,7 +65,7 @@ public class SD {
      * Save JPEG
      * @param data
      */
-    static public void saveImage(byte[] data){
+    public static void saveImage(byte[] data, Context context){
         File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
@@ -81,13 +85,14 @@ public class SD {
                 new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent.setData(Uri.fromFile(pictureFile));
 //        sendBroadcast(intent);
+        MediaScannerConnection.scanFile(context, new String[]{pictureFile.getAbsolutePath()}, null, null);
     }
 
     /**
      * Save bitmap
      * @param image
      */
-    static public void saveImage(Bitmap image, int cropwidth, int cropheight){
+    static public void saveImage(Bitmap image, int cropwidth, int cropheight, Context context){
         File pictureFile = getOutputMediaFile(MEDIA_TYPE_BITM);
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
@@ -104,6 +109,7 @@ public class SD {
         } catch (IOException e) {
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
+        MediaScannerConnection.scanFile(context, new String[]{pictureFile.getAbsolutePath()}, null, null);
     }
 
 //    public static Bitmap combineImages(Bitmap image, int cropwidth, int cropheight) {

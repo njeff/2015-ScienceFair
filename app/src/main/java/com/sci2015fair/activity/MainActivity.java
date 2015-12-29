@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import com.sci2015fair.R;
 import com.sci2015fair.opencv.Classify;
 
+import com.sci2015fair.service.AppStartupServiceHub;
 import com.sci2015fair.service.CameraService;
+import com.sci2015fair.service.CheckFilesPresentService;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 
@@ -43,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
     }
 
     @Override
