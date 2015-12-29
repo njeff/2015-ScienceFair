@@ -19,6 +19,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.PointF;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
@@ -39,6 +40,13 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 import com.sci2015fair.csvlog.ConsoleLogCSVWriter;
+import com.sci2015fair.opencv.FeatureCorner;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Point;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,14 +64,9 @@ public class CameraService extends Service {
     private CameraPreview mPreview;
 
     private int cropheight, cropwidth, cameraheightres, camerawidthres;
-    int leftBound;
-    int topBound;
-    //right, bottom
-    int rightBound;
-    int bottomBound;
+    private int leftBound, topBound, rightBound, bottomBound;
     //center coordinates
-    int cx;
-    int cy;
+    private int cx, cy;
 
     public CameraService() {
     }
@@ -105,8 +108,8 @@ public class CameraService extends Service {
         Camera.Parameters cParams = mCamera.getParameters();
         cParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         cParams.setJpegQuality(100);
-        List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
 
+        List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
@@ -124,9 +127,40 @@ public class CameraService extends Service {
 
         Timer stopTimer = new Timer();
         stopTimer.schedule(timestop, 10000); //kill service after 10 seconds if no face is found
+
+        System.loadLibrary("opencv_java3");
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, getApplicationContext(), mLoaderCallback);
+        } else {
+            Log.d(TAG, "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
     }
 
+    /**
+     * OpenCV Callback
+     */
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS:
+                {
+                    Log.i(TAG, "OpenCV loaded successfully");
+                    //mOpenCvCameraView.enableView();
+                } break;
+                default:
+                {
+                    super.onManagerConnected(status);
+                } break;
+            }
+        }
+    };
+
     private boolean taken = false; //whether or not photo has been taken
+    private boolean trigger = false; //whether the state for taking the photo has been reached
     private int verify = 0; //make sure the face has been detected for long enough
 
     //face detection listener
@@ -138,7 +172,7 @@ public class CameraService extends Service {
                 stopSelf();
             }
 
-            if(faces.length==1){
+            if(!trigger && faces.length == 1){
                 verify++;
                 //translates .rect's coordinates from a scale of -1000 to 1000 on both axis to the camera's native resolution with (0,0) on the upper left corner
                 leftBound = (1000 + faces[0].rect.left) * camerawidthres / 2000;
@@ -161,14 +195,14 @@ public class CameraService extends Service {
                 ConsoleLogCSVWriter.writeCsvFile("AutoCamera", String.valueOf(topBound) + "/" + cameraheightres);
                 ConsoleLogCSVWriter.writeCsvFile("AutoCamera", String.valueOf(bottomBound) + "/" + cameraheightres);
 
-                if(taken == false && verify == 3){
+                if(!taken && verify == 3){ //has one face been seen 3 times in a row?
+                    trigger = true;
                     mCamera.takePicture(null, null, mPicture);
-
                     Log.d(TAG, "Taking Picture...");
-                    ConsoleLogCSVWriter.writeCsvFile("AutoCamera","Taking Picture...");
-
+                    ConsoleLogCSVWriter.writeCsvFile("AutoCamera", "Taking Picture...");
                 }
             }
+
             else {
                 verify = 0;
             }
@@ -176,26 +210,28 @@ public class CameraService extends Service {
         }
     };
 
-    //http://developer.android.com/guide/topics/media/camera.html
+    /*
+      http://developer.android.com/guide/topics/media/camera.html
+      http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
+      save to photos folder on phone
+    */
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            //http://android-er.blogspot.com/2011/01/save-camera-image-using-mediastore.html
-            //save to photos folder on phone
-
             Bitmap rawBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);//create bitmap of image from datastream
             Matrix matrix = new Matrix();
-//            matrix.postScale(0.5f, 0.5f);
-//            matrix.postRotate(-90);
-            Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            int rotation = display.getRotation();
-            Log.d(TAG, "Rotation: " + rotation + " Degrees");
-            matrix.postRotate(rotation);
 
+            Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay(); //does not work
+            int rotation = display.getRotation()-90;
+            Log.d(TAG, "Rotation: " + rotation + " Degrees");
+
+            matrix.postRotate(rotation);
             Bitmap rotatedBitmap = Bitmap.createBitmap(rawBitmap, 0, 0, rawBitmap.getWidth(), rawBitmap.getHeight(), matrix, true);
+            /*
             if(SD.hasStorage(true)) {
-                SD.saveImage(data);
-                cropPicture(rotatedBitmap, true);//run method to generate cropped picture
+                //SD.saveImage(data);
+                SD.saveImage(rotatedBitmap);
+                //detectImage(rotatedBitmap, true);
                 taken = true;
             } else {
                 ContentValues val = new ContentValues(); //save to android mediastore
@@ -206,7 +242,7 @@ public class CameraService extends Service {
                     os.write(data);
                     os.flush();
                     os.close();
-                    cropPicture(rotatedBitmap, false);
+                    //detectImage(rotatedBitmap, false);
                     taken = true; //set flag - photo has been taken
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found: " + e.getMessage());
@@ -214,20 +250,22 @@ public class CameraService extends Service {
                     Log.d(TAG, "Error accessing file: " + e.getMessage());
                 }
             }
+            */
+            detectImage(rotatedBitmap, true); //find features and save image
+            taken = true;
         }
     };
 
     /**
-     * Crop image to face
-     * @param rotatedBitmap
-     * @param SDv
-     */
-
-    public void cropPicture(Bitmap rotatedbitmap, boolean SDv) {
+    * (Crop image to face) and do facial landmarking
+    * @param rotatedBitmap image
+    * @param SDv if there is an SD card
+    */
+    public void detectImage(Bitmap rotatedBitmap, boolean SDv) {
         Matrix matrix = new Matrix();
-        matrix.setRotate(-90);
-        matrix.postScale(0.75f, 0.75f);
-        Bitmap croppedbitmap = Bitmap.createBitmap(rotatedbitmap, leftBound, topBound, cropheight, cropwidth, matrix, true);
+        //matrix.setRotate(-90);
+        Bitmap temp = rotatedBitmap.copy(rotatedBitmap.getConfig(),true);
+        Bitmap croppedbitmap = rotatedBitmap;
 
         FaceDetector detector = new FaceDetector.Builder(getApplicationContext())
                 .setTrackingEnabled(false)
@@ -238,7 +276,7 @@ public class CameraService extends Service {
         Frame frame = new Frame.Builder().setBitmap(croppedbitmap).build();
         SparseArray<Face> faces = detector.detect(frame);
 
-        croppedbitmap = convertToMutable(croppedbitmap);
+        croppedbitmap = convertToMutable(croppedbitmap); //allow for editing
         Canvas can = new Canvas(croppedbitmap);
 
         Paint paint = new Paint();
@@ -247,38 +285,69 @@ public class CameraService extends Service {
         paint.setStrokeWidth(5);
 
         Log.d(TAG, "Number of Faces: " + faces.size());
-        /*
+
         for (int i = 0; i < faces.size(); ++i) {
             Face face = faces.valueAt(i);
             Log.d(TAG,"LE: "+face.getIsLeftEyeOpenProbability()+" RE: "+face.getIsRightEyeOpenProbability()+" SP: "+face.getIsSmilingProbability());
 
+            /*
+            PointF rightEye = new PointF();
+            PointF leftEye = new PointF();
+            PointF noseBase = new PointF();
+            double yaxis = face.getEulerY();
 
-            for (Landmark landmark : face.getLandmarks()) {
+            for(Landmark landmark : face.getLandmarks()) {
+                switch (landmark.getType()){
+                    case Landmark.LEFT_EYE:
+                        leftEye = landmark.getPosition();
+                        break;
+                    case Landmark.RIGHT_EYE:
+                        rightEye = landmark.getPosition();
+                        break;
+                    case Landmark.NOSE_BASE:
+                        noseBase = landmark.getPosition();
+                        break;
+                }
+                //draw points
                 int cx = (int) (landmark.getPosition().x);
                 int cy = (int) (landmark.getPosition().y);
                 paint.setARGB(255, 50, 50, 255);
                 can.drawCircle(cx, cy, 2, paint);
             }
-            double yaxis = face.getEulerY();
 
-            float righteyeX = face.getLandmarks().get(0).getPosition().x;
-            float lefteyeX = face.getLandmarks().get(1).getPosition().x;
-            float dist = (righteyeX-lefteyeX)/(float)Math.cos(yaxis); //scale if face is rotated
-            float righteyeY = face.getLandmarks().get(0).getPosition().y;
-            float lefteyeY = face.getLandmarks().get(1).getPosition().y;
-            can.drawRect(righteyeX-dist/3,righteyeY+dist/4,righteyeX+dist/3,righteyeY-dist/4,paint); //box right eye
-            can.drawRect(lefteyeX-dist/3,lefteyeY+dist/4,lefteyeX+dist/3,lefteyeY-dist/4,paint); //box left eye
+            float dist = (leftEye.x-rightEye.x);// /(float)Math.cos(yaxis); //distance between eyes, (scale if face is rotated)
+            float mouthtop = noseBase.y+dist/4;
+            can.drawRect(rightEye.x-dist*2/5,rightEye.y+dist/5,rightEye.x+dist*2/5,rightEye.y-dist/5,paint); //box right eye
+            Bitmap rE = Bitmap.createBitmap(temp,(int)(rightEye.x-dist*2/5),(int)(rightEye.y-dist/5),(int)(dist*4/5),(int)(dist*2/5));
+            SD.saveImage(rE); //save eye crop (temp)
 
-            float nosebaseX = face.getLandmarks().get(2).getPosition().x;
-            float nosebaseY = face.getLandmarks().get(2).getPosition().y;
-            float mouthtop = nosebaseY-dist/4;
-            can.drawRect(nosebaseX-dist/2,mouthtop,nosebaseX+dist/2,mouthtop-dist*3/5,paint); //box mouth
+            can.drawRect(leftEye.x-dist*2/5,leftEye.y+dist/5,leftEye.x+dist*2/5,leftEye.y-dist/5,paint); //box left eye
+            Bitmap lE = Bitmap.createBitmap(temp,(int)(leftEye.x-dist*2/5),(int)(leftEye.y-dist/5),(int)(dist*4/5),(int)(dist*2/5));
+
+            can.drawRect(noseBase.x + dist * 5 / 11, mouthtop, noseBase.x - dist * 5 / 11, mouthtop + dist * 3 / 5, paint); //box mouth
+
+            FeatureCorner det = new FeatureCorner();
+            det.edgeCorners(rE);
+            PointF left = det.getPoint(1);
+            PointF right = det.getPoint(2);
+            can.drawCircle((rightEye.x-dist*2/5)+left.x, (rightEye.y-dist/5)+left.y, 2, paint);
+            can.drawCircle((rightEye.x - dist * 2 / 5) + right.x, (rightEye.y - dist / 5) + right.y, 2, paint);
+
+            det.edgeCorners(lE);
+            left = det.getPoint(1);
+            right = det.getPoint(2);
+            can.drawCircle((leftEye.x-dist*2/5)+left.x, (leftEye.y-dist/5)+left.y, 2, paint);
+            can.drawCircle((leftEye.x - dist * 2 / 5) + right.x, (leftEye.y - dist / 5) + right.y, 2, paint);
+            */
         }
-        */
+
         detector.release();
 
         if(SDv){
-            SD.saveImage(croppedbitmap, cropwidth, cropheight);
+            File image = SD.saveImage(croppedbitmap, false); //save image
+            Intent i = new Intent(getApplicationContext(), Classify.class);
+            i.putExtra("filepath",image.getAbsolutePath());
+            startService(i); //launch OpenCV classifier
         } else {
             ContentValues val = new ContentValues();
             Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
@@ -389,7 +458,6 @@ public class CameraService extends Service {
 
     @Override
     public void onDestroy(){
-        //startService(new Intent(getApplicationContext(), Classify.class)); //launch OpenCV classifier
         Log.d(TAG, "destroy");
         super.onDestroy();
         if (mPreview != null) windowManager.removeView(mPreview); //remove camera preview

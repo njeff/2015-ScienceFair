@@ -31,12 +31,12 @@ public class ConsoleLogCSVWriter {
     public static void checkForExistingCSVFile(String outputmessagecategory, String mainoutputstring) {
         long id = 1;
         try {
-            Log.d("MyCameraApp", "create directory");
+            //Log.d("MyCameraApp", "create directory");
             if (!filedirectory.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
+                //Log.d("MyCameraApp", "failed to create directory");
             }
             if (!filedirectorycsv.createNewFile()) {
-                Log.d("MyCameraApp", "failed to create csv log file");
+                //Log.d("MyCameraApp", "failed to create csv log file");
             }
             BufferedReader fileReader = new BufferedReader(new FileReader(filedirectorycsv));
             while ((fileReader.readLine()) != null) {
@@ -85,7 +85,7 @@ public class ConsoleLogCSVWriter {
 
 
 
-            System.out.println("CSV file was created successfully !!!");
+            //System.out.println("CSV file was created successfully !!!");
         } catch (Exception e) {
             System.out.println("Error in CsvFileWriter !!!");
             e.printStackTrace();

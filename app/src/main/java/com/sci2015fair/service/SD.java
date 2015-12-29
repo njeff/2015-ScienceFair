@@ -43,10 +43,13 @@ public class SD {
         return false;
     }
 
+    /**
+     * Create a temporary file to see whether a volume is really writeable.
+     * It's important not to put it in the root directory which may have a
+     * limit on the number of files.
+     * @return
+     */
     private static boolean checkFsWritable() {
-        // Create a temporary file to see whether a volume is really writeable.
-        // It's important not to put it in the root directory which may have a
-        // limit on the number of files.
         String directoryName = Environment.getExternalStorageDirectory().toString() + "/DCIM";
         File directory = new File(directoryName);
         if (!directory.isDirectory()) {
@@ -60,12 +63,19 @@ public class SD {
     /**
      * Save JPEG
      * @param data
+     * @param process if the picture was processed
+     * @return Picture file
      */
-    static public void saveImage(byte[] data){
-        File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+    static public File saveImage(byte[] data, boolean process){
+        File pictureFile;
+        if(process){
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_PROCIMAGE);
+        } else {
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_UNPROCIMAGE);
+        }
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
-            return;
+            return null;
         }
 
         try {
@@ -80,18 +90,25 @@ public class SD {
         Intent intent =//rescan MTP directory; this code is still not working to our knowledge (2015.11.14-15), need to figure out how to utilize the sendBroadcast() method.
                 new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent.setData(Uri.fromFile(pictureFile));
-//        sendBroadcast(intent);
+        return pictureFile;
     }
 
     /**
      * Save bitmap
      * @param image
+     * @param process if the picture was processed
+     * @return Picture file
      */
-    static public void saveImage(Bitmap image, int cropwidth, int cropheight){
-        File pictureFile = getOutputMediaFile(MEDIA_TYPE_BITM);
+    static public File saveImage(Bitmap image, boolean process){
+        File pictureFile;
+        if(process){
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_PROCIMAGE);
+        } else {
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_UNPROCIMAGE);
+        }
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
-            return;
+            return null;
         }
 
         try {
@@ -104,6 +121,7 @@ public class SD {
         } catch (IOException e) {
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
+        return pictureFile;
     }
 
 //    public static Bitmap combineImages(Bitmap image, int cropwidth, int cropheight) {
@@ -117,9 +135,14 @@ public class SD {
 //        canvas.drawCircle(50, 50, 3, paint);
 //    }
 
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_BITM = 2;
+    public static final int MEDIA_TYPE_UNPROCIMAGE = 1;
+    public static final int MEDIA_TYPE_PROCIMAGE = 2;
 
+    /**
+     * Generates the file objects for writing out images
+     * @param type
+     * @return
+     */
     private static File getOutputMediaFile(int type){
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -140,10 +163,10 @@ public class SD {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
+        if (type == MEDIA_TYPE_UNPROCIMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_BITM) {
+        } else if(type == MEDIA_TYPE_PROCIMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + "b.jpg");
         } else {

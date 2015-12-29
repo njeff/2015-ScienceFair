@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.application'
 
 android {
@@ -12,13 +14,27 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            moduleName "jni_stasm"
+            moduleName "clandmark"
             stl "stlport_shared"
-            cFlags "-fexceptions -I " + "C:\\Users\\Jeffrey\\Documents\\SciFair2015-2016\\android-ndk-r10e\\sources\\cxx-stl\\gnu-libstdc++\\4.9\\include"
         }
     }
 
-    sourceSets.main.jni.srcDirs = []
+    sourceSets.main {
+        jni.srcDirs = []
+        jniLibs.srcDir 'src/main/libs'
+    }
+
+    task ndkBuild(type: Exec) { // call ndk-build(.cmd) script
+        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            commandLine 'cmd', '/c', 'ndk-build.cmd', '-C', file('src/main').absolutePath
+        } else {
+            commandLine 'ndk-build', '-C', file('src/main').absolutePath
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
 
     buildTypes {
         release {

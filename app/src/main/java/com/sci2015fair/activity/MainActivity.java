@@ -23,7 +23,6 @@ import com.sci2015fair.service.CameraService;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 
-
     private static final String TAG = "MainActivity";
     
     /**
@@ -38,9 +37,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Log.d("a",stringFromJNI());
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -52,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
     }
 
     @Override
