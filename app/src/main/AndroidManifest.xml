@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- To access Google+ APIs: -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,7 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/BaseTheme" >
         <activity
-            android:name="com.sci2015fair.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -38,26 +40,69 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.sci2015fair.service.CameraServiceStarter" >
+        <receiver android:name=".service.CameraServBroadcastReceiverStarter" >
             <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".service.SurveyServiceStarter" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".service.SystemStartupServBroadcastReceiverHub" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name="com.sci2015fair.service.CameraService"
+            android:name=".service.CameraService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
         <service
-            android:name="com.sci2015fair.service.Notifications"
+            android:name=".service.Notifications"
             android:enabled="true"
             android:exported="true" >
         </service>
-
         <service
-            android:name="com.sci2015fair.opencv.Classify"
+            android:name=".opencv.Classify"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".service.PedometerServicePersistent"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".service.NotificationServicePersistent"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".service.CheckFilesPresentService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".service.AppStartupServiceHub"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".service.CheckIfPersistentServicesRunning"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".service.LocationGPSLogPersistentService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".fileoperations.ScanMediaService"
             android:enabled="true"
             android:exported="true" >
         </service>

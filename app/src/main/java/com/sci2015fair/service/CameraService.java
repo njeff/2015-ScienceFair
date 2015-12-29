@@ -19,7 +19,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.PointF;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
@@ -29,24 +28,21 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.WindowManager;
-import com.google.android.gms.vision.Detector;
+
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.google.android.gms.vision.face.Landmark;
-import com.sci2015fair.opencv.Classify;
+
 import java.io.File;
 import android.view.Display;
-import android.view.Gravity;
-import android.view.WindowManager;
-import com.sci2015fair.csvlog.ConsoleLogCSVWriter;
-import com.sci2015fair.opencv.FeatureCorner;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Point;
 
+import com.sci2015fair.fileoperations.SavePictures;
+import com.sci2015fair.fileoperations.ConsoleLogCSVWriter;
+import com.sci2015fair.opencv.Classify;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -78,21 +74,24 @@ public class CameraService extends Service {
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate(){//everything starts here when service is started
         super.onCreate();
 
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        //create 16x16 window for camera feed to show onscreen wen service is started
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);//get system's high-level window manager for our display to be shown on all screens regardless of applications running or things displayed
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                16,
-                16,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
+                16,//set length
+                16,//set height
+                WindowManager.LayoutParams.TYPE_PHONE,//for phone-factor devices
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,//not clickable by user
+                PixelFormat.TRANSLUCENT);//?
 
-        params.gravity = Gravity.TOP | Gravity.LEFT;
-        params.x = 0;
-        params.y = 0;
+        params.gravity = Gravity.TOP | Gravity.LEFT;//sets origin orientation of WindowManager
+        params.x = 0;//x position for window (measured from top left)
+        params.y = 0;//y position for window
+
 
         if(checkCameraHardware(this)) {
             releaseCamera();
@@ -104,6 +103,7 @@ public class CameraService extends Service {
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
         //enable autofocus
         Camera.Parameters cParams = mCamera.getParameters();
         cParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
@@ -202,7 +202,6 @@ public class CameraService extends Service {
                     ConsoleLogCSVWriter.writeCsvFile("AutoCamera", "Taking Picture...");
                 }
             }
-
             else {
                 verify = 0;
             }
@@ -227,10 +226,11 @@ public class CameraService extends Service {
 
             matrix.postRotate(rotation);
             Bitmap rotatedBitmap = Bitmap.createBitmap(rawBitmap, 0, 0, rawBitmap.getWidth(), rawBitmap.getHeight(), matrix, true);
+
             /*
-            if(SD.hasStorage(true)) {
-                //SD.saveImage(data);
-                SD.saveImage(rotatedBitmap);
+            if(SavePictures.hasStorage(true)) {
+                //SD.saveImage(data, false, getApplicationContext());
+                SavePictures.saveImage(rotatedBitmap,false,getApplicationContext());
                 //detectImage(rotatedBitmap, true);
                 taken = true;
             } else {
@@ -344,26 +344,27 @@ public class CameraService extends Service {
         detector.release();
 
         if(SDv){
-            File image = SD.saveImage(croppedbitmap, false); //save image
+            File image = SavePictures.saveImage(croppedbitmap, false, getApplicationContext()); //save image
             Intent i = new Intent(getApplicationContext(), Classify.class);
             i.putExtra("filepath",image.getAbsolutePath());
             startService(i); //launch OpenCV classifier
         } else {
             ContentValues val = new ContentValues();
             Uri seconduriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, val);
-            MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A", null);
+            MediaStore.Images.Media.insertImage(getContentResolver(), croppedbitmap, "A", null);//insert image into directory in a file format, saving it
+
         }
     }
 
     /**
-     * Check for camera
+     * Check for front-facing camera.
      * @param context
-     * @return if camera exists
+     * @return boolean if front-facing camera exists
      */
     private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)){
             // this device has a camera
-            Log.d(TAG,"camera found");
+            Log.d(TAG,"Camera Found");
             return true;
         } else {
             // no camera on this device

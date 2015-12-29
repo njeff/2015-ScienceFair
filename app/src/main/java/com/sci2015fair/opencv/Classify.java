@@ -16,7 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.sci2015fair.R;
-import com.sci2015fair.service.SD;
+import com.sci2015fair.fileoperations.SavePictures;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -197,7 +197,7 @@ public class Classify extends Service {
             }
             Bitmap bmp = Bitmap.createBitmap(image.width(),image.height(),Bitmap.Config.ARGB_8888); //convert back
             Utils.matToBitmap(image, bmp);
-            SD.saveImage(bmp,true);
+            SavePictures.saveImage(bmp, true, getApplicationContext());
             //land.delete(); //delete after it is loaded
             // originalImage.delete();//remove old image
             // Stop the service using the startId, so that we don't stop

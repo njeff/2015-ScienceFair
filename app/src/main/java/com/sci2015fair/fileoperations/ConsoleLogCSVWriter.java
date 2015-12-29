@@ -1,7 +1,8 @@
-package com.sci2015fair.csvlog;
+package com.sci2015fair.fileoperations;
 
 import android.os.Environment;
-import android.util.Log;
+
+import com.sci2015fair.filecontrolcenter.SaveLocations;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,28 +18,14 @@ public class ConsoleLogCSVWriter {
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
-    private static final File filedirectory = new File(Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES), "2015-ScienceFair-Documents");
-    private static final File filedirectorycsv = new File(Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES), "2015-ScienceFair-Documents/consolelog.csv");
+    private static final File DFConsoleLogCSV = SaveLocations.DFConsoleLogCSV;
     //CSV file header
     private static final String FILE_HEADER = "id,date,time,outputmessagecategory,mainoutputstring";
 
     public static void writeCsvFile(String outputmessagecategory, String mainoutputstring) {
-        checkForExistingCSVFile(outputmessagecategory, mainoutputstring);
-    }
-
-    public static void checkForExistingCSVFile(String outputmessagecategory, String mainoutputstring) {
-        long id = 1;
+        long id = 0;
         try {
-            //Log.d("MyCameraApp", "create directory");
-            if (!filedirectory.mkdirs()) {
-                //Log.d("MyCameraApp", "failed to create directory");
-            }
-            if (!filedirectorycsv.createNewFile()) {
-                //Log.d("MyCameraApp", "failed to create csv log file");
-            }
-            BufferedReader fileReader = new BufferedReader(new FileReader(filedirectorycsv));
+            BufferedReader fileReader = new BufferedReader(new FileReader(DFConsoleLogCSV));
             while ((fileReader.readLine()) != null) {
                 id++;
             }
@@ -51,7 +38,7 @@ public class ConsoleLogCSVWriter {
     public static void transcriber(long id, String outputmessagecategory, String mainoutputstring) {
 
         //Create new students objects
-        ConsoleLogPOJO logLine = new ConsoleLogPOJO(id, outputmessagecategory, mainoutputstring);
+        ConsoleLogObject logLine = new ConsoleLogObject(id, outputmessagecategory, mainoutputstring);
 
         //Create a new list of student objects
 
@@ -63,16 +50,17 @@ public class ConsoleLogCSVWriter {
 
 
         try {
-            fileWriter = new BufferedWriter(new FileWriter(filedirectorycsv, true));
-            if (id == 1) {
+            fileWriter = new BufferedWriter(new FileWriter(DFConsoleLogCSV, true));
+            if (id == 0) {
                 //Write the CSV file header
                 fileWriter.append(FILE_HEADER.toString());
 
                 //Add a new line separator after the header
                 fileWriter.append(NEW_LINE_SEPARATOR);
+                id = 1;
             }
             //Write a new student object list to the CSV file
-            fileWriter.append(String.valueOf(logLine.getId()));
+            fileWriter.append(String.valueOf(id));
             fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(logLine.getDate());
             fileWriter.append(COMMA_DELIMITER);

@@ -1,10 +1,13 @@
-package com.sci2015fair.service;
+package com.sci2015fair.fileoperations;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -21,8 +24,8 @@ import java.util.Date;
  *
  * Created by Jeffrey on 9/26/2015.
  */
-public class SD {
-    static final String TAG = "sd";
+public class SavePictures {
+    static final String TAG = "SD";
     //http://stackoverflow.com/questions/902089/how-to-tell-if-the-sdcard-is-mounted-in-android
     static public boolean hasStorage(boolean requireWriteAccess) {
         //TODO: After fix the bug,  add "if (VERBOSE)" before logging errors.
@@ -66,13 +69,14 @@ public class SD {
      * @param process if the picture was processed
      * @return Picture file
      */
-    static public File saveImage(byte[] data, boolean process){
+    static public File saveImage(byte[] data, boolean process, Context context){
         File pictureFile;
         if(process){
             pictureFile = getOutputMediaFile(MEDIA_TYPE_PROCIMAGE);
         } else {
             pictureFile = getOutputMediaFile(MEDIA_TYPE_UNPROCIMAGE);
         }
+
         if (pictureFile == null){
             Log.d(TAG, "Error creating media file, check storage permissions: " );
             return null;
@@ -90,6 +94,7 @@ public class SD {
         Intent intent =//rescan MTP directory; this code is still not working to our knowledge (2015.11.14-15), need to figure out how to utilize the sendBroadcast() method.
                 new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent.setData(Uri.fromFile(pictureFile));
+        MediaScannerConnection.scanFile(context, new String[]{pictureFile.getAbsolutePath()}, null, null);
         return pictureFile;
     }
 
@@ -99,7 +104,7 @@ public class SD {
      * @param process if the picture was processed
      * @return Picture file
      */
-    static public File saveImage(Bitmap image, boolean process){
+    static public File saveImage(Bitmap image, boolean process, Context context){
         File pictureFile;
         if(process){
             pictureFile = getOutputMediaFile(MEDIA_TYPE_PROCIMAGE);
@@ -121,6 +126,7 @@ public class SD {
         } catch (IOException e) {
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
+        MediaScannerConnection.scanFile(context, new String[]{pictureFile.getAbsolutePath()}, null, null);
         return pictureFile;
     }
 

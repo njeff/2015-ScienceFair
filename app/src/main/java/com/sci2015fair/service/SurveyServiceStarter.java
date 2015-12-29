@@ -17,8 +17,8 @@ public class SurveyServiceStarter extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) ||//has the phone's boot sequence completed?
                 intent.getAction().equals(Intent.ACTION_USER_PRESENT))//have we logged in?
         {
-            Intent camServ = new Intent(context,ItemFragment.class);//create intent
-            context.startService(camServ);//start CameraService
+//            Intent camServ = new Intent(context,Notifications.class);//create intent
+//            context.startService(camServ);//start CameraService
         }
     }
 }

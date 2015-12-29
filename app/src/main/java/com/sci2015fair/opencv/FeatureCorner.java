@@ -15,8 +15,6 @@ import org.opencv.imgproc.Imgproc;
 import android.graphics.PointF;
 import android.util.Log;
 
-import com.sci2015fair.service.SD;
-
 /**
  * Created by Jeffrey on 12/13/2015.
  */
@@ -129,6 +127,5 @@ public class FeatureCorner {
 
         Bitmap mapmap = Bitmap.createBitmap(bitmap,0,0,image.width(),image.height());
         //Utils.matToBitmap(image, mapmap);
-        //SD.saveImage(mapmap);
     }
 }

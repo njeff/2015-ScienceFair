@@ -1,4 +1,4 @@
-package com.sci2015fair.csvlog;
+package com.sci2015fair.fileoperations;
 
 /**
  * Created by Mitchell on 11/1/2015.
