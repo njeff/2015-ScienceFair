@@ -167,6 +167,7 @@ public class CameraService extends Service {
     private Camera.FaceDetectionListener faceDetectionListener = new Camera.FaceDetectionListener(){
         @Override
         public void onFaceDetection(Camera.Face[] faces, Camera camera){
+            int checkswitch = 0;
             if(taken == true){
                 Log.d(TAG, "taken!");
                 stopSelf();
