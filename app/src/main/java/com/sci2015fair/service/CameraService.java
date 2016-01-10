@@ -42,10 +42,10 @@ import org.opencv.android.OpenCVLoader;
 
 import com.sci2015fair.fileoperations.SavePictures;
 import com.sci2015fair.fileoperations.ConsoleLogCSVWriter;
-import com.sci2015fair.opencv.Classify;
+import com.sci2015fair.landmark.Classify;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -110,8 +110,11 @@ public class CameraService extends Service {
         cParams.setJpegQuality(100);
 
         List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
-        cameraheightres = sizes.get(0).height;
-        camerawidthres = sizes.get(0).width;
+        for(Camera.Size size: sizes){
+            Log.d(TAG,size.height + " " + size.width);
+        }
+        cameraheightres = sizes.get(24).height;
+        camerawidthres = sizes.get(24).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
         mCamera.setParameters(cParams);
 
@@ -313,32 +316,32 @@ public class CameraService extends Service {
                 int cx = (int) (landmark.getPosition().x);
                 int cy = (int) (landmark.getPosition().y);
                 paint.setARGB(255, 50, 50, 255);
-                can.drawCircle(cx, cy, 2, paint);
+                //can.drawCircle(cx, cy, 2, paint);
             }
 
             float dist = (leftEye.x-rightEye.x);// /(float)Math.cos(yaxis); //distance between eyes, (scale if face is rotated)
             float mouthtop = noseBase.y+dist/4;
-            can.drawRect(rightEye.x-dist*2/5,rightEye.y+dist/5,rightEye.x+dist*2/5,rightEye.y-dist/5,paint); //box right eye
+            //can.drawRect(rightEye.x-dist*2/5,rightEye.y+dist/5,rightEye.x+dist*2/5,rightEye.y-dist/5,paint); //box right eye
             Bitmap rE = Bitmap.createBitmap(temp,(int)(rightEye.x-dist*2/5),(int)(rightEye.y-dist/5),(int)(dist*4/5),(int)(dist*2/5));
-            SD.saveImage(rE); //save eye crop (temp)
+            SavePictures.saveImage(rE,true,getApplicationContext()); //save eye crop (temp)
 
-            can.drawRect(leftEye.x-dist*2/5,leftEye.y+dist/5,leftEye.x+dist*2/5,leftEye.y-dist/5,paint); //box left eye
+            //can.drawRect(leftEye.x-dist*2/5,leftEye.y+dist/5,leftEye.x+dist*2/5,leftEye.y-dist/5,paint); //box left eye
             Bitmap lE = Bitmap.createBitmap(temp,(int)(leftEye.x-dist*2/5),(int)(leftEye.y-dist/5),(int)(dist*4/5),(int)(dist*2/5));
 
-            can.drawRect(noseBase.x + dist * 5 / 11, mouthtop, noseBase.x - dist * 5 / 11, mouthtop + dist * 3 / 5, paint); //box mouth
+            //can.drawRect(noseBase.x + dist * 5 / 11, mouthtop, noseBase.x - dist * 5 / 11, mouthtop + dist * 3 / 5, paint); //box mouth
 
             FeatureCorner det = new FeatureCorner();
             det.edgeCorners(rE);
             PointF left = det.getPoint(1);
             PointF right = det.getPoint(2);
-            can.drawCircle((rightEye.x-dist*2/5)+left.x, (rightEye.y-dist/5)+left.y, 2, paint);
-            can.drawCircle((rightEye.x - dist * 2 / 5) + right.x, (rightEye.y - dist / 5) + right.y, 2, paint);
+            //can.drawCircle((rightEye.x-dist*2/5)+left.x, (rightEye.y-dist/5)+left.y, 2, paint);
+            //can.drawCircle((rightEye.x - dist * 2 / 5) + right.x, (rightEye.y - dist / 5) + right.y, 2, paint);
 
             det.edgeCorners(lE);
             left = det.getPoint(1);
             right = det.getPoint(2);
-            can.drawCircle((leftEye.x-dist*2/5)+left.x, (leftEye.y-dist/5)+left.y, 2, paint);
-            can.drawCircle((leftEye.x - dist * 2 / 5) + right.x, (leftEye.y - dist / 5) + right.y, 2, paint);
+            //can.drawCircle((leftEye.x-dist*2/5)+left.x, (leftEye.y-dist/5)+left.y, 2, paint);
+            //can.drawCircle((leftEye.x - dist * 2 / 5) + right.x, (leftEye.y - dist / 5) + right.y, 2, paint);
             */
         }
 

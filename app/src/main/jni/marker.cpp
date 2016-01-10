@@ -13,7 +13,7 @@ extern "C" {
     using namespace clandmark;
     using namespace std;
 
-    JNIEXPORT jintArray JNICALL Java_com_sci2015fair_opencv_Classify_runLandmarks(JNIEnv *env, jobject thiz, jint cols, jint rows, jintArray bbox, jbyteArray data, jstring inpath){
+    JNIEXPORT jintArray JNICALL Java_com_sci2015fair_landmark_Classify_runLandmarks(JNIEnv *env, jobject thiz, jint cols, jint rows, jintArray bbox, jbyteArray data, jstring inpath){
 
         const char* path = env->GetStringUTFChars(inpath,NULL); //path to the flandmark_model.xml
         jbyte* data2 = env->GetByteArrayElements(data,0); //load image data

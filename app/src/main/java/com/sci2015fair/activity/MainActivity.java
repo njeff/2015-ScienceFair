@@ -2,14 +2,12 @@ package com.sci2015fair.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,11 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sci2015fair.R;
-import com.sci2015fair.opencv.Classify;
 
-import com.sci2015fair.service.AppStartupServiceHub;
 import com.sci2015fair.service.CameraService;
-import com.sci2015fair.service.CheckFilesPresentService;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 

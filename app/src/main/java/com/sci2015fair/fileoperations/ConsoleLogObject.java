@@ -39,9 +39,9 @@ public class ConsoleLogObject {
     }
 
     public String setDate() {
-        DateFormat tf = new SimpleDateFormat("HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("MM/dd/yy");
         Date dateobj = new Date();
-        date = tf.format(dateobj);
+        date = df.format(dateobj);
         return date;
     }
     public String getTime() {
@@ -53,9 +53,9 @@ public class ConsoleLogObject {
     }
 
     public String setTime() {
-        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        DateFormat tf = new SimpleDateFormat("HH:mm:ss");
         Date dateobj = new Date();
-        time = df.format(dateobj);
+        time = tf.format(dateobj);
         return time;
     }
 

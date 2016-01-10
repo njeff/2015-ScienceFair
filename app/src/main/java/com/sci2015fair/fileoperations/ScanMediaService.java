@@ -34,7 +34,7 @@ public class ScanMediaService extends Service {
         // TODO Auto-generated method stub
 
         toBeScanned = (ArrayList<String>) (intent.getStringArrayListExtra("Scan Files")).clone();
-        Log.d("READY", "greiuhgregehiujktgrefghkefauihkertoigtjiodfbjioth");
+        Log.d("READY", "----------------------SCAN---------------------");
         Log.d("READY", toBeScanned.toString());
         scanFiles(this, toBeScanned);
         return super.onStartCommand(intent, flags, startId);

@@ -69,7 +69,7 @@
             android:exported="true" >
         </service>
         <service
-            android:name=".opencv.Classify"
+            android:name=".landmark.Classify"
             android:enabled="true"
             android:exported="true" >
         </service>
