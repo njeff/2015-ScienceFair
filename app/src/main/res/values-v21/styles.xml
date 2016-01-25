@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme"
         parent="@style/BaseTheme">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorPrimary">@color/red500</item>
+        <item name="android:colorPrimaryDark">@color/red900</item>
 
         <!-- Customize your theme here. -->
     </style>

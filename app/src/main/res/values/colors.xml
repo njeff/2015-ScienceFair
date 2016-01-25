@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#F44336</color>
-    <color name="colorPrimaryDark">#B71C1C</color>
-    <color name="windowBackground">#D50000</color>
+    <color name="red500">#F44336</color>
+    <color name="red100">#FFCDD2</color>
+    <color name="red300">#E57373</color>
+    <color name="red900">#B71C1C</color>
+    <color name="redA700">#D50000</color>
+
+    <color name="cy500">#00BCD4</color>
+    <color name="cy100">#B2EBF2</color>
+    <color name="cy300">#4DD0E1</color>
+    <color name="cy900">#006064</color>
+    <color name="cyA700">#00B8D4</color>
+
 </resources>

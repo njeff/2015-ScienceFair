@@ -2,14 +2,27 @@ package com.sci2015fair.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
+import com.google.android.gms.vision.Frame;
 import com.sci2015fair.R;
+import com.sci2015fair.filecontrolcenter.SaveLocations;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +41,7 @@ public class ConsoleLogFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String TAG = "ConsoleLogF";
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,7 +80,57 @@ public class ConsoleLogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_console_log, container, false);
+        View view = inflater.inflate(R.layout.fragment_console_log, container, false);
+        TableLayout t = (TableLayout)view.findViewById(R.id.logtable);
+        t.removeAllViews();
+        try{
+            //read first 25 lines of the log
+            BufferedReader fileReader = new BufferedReader(new FileReader(SaveLocations.DFConsoleLogCSV));
+            int i = 0;
+            String line;
+            TableRow.LayoutParams param = new TableRow.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.FILL_PARENT);
+            param.weight = 1;
+            while ((line = fileReader.readLine()) != null) {
+                String[] s = line.split(",");
+                TableRow tr = new TableRow(getContext());
+                tr.setId(i);
+                tr.setLayoutParams(param);
+
+                for(int j = 0; j<3; j++){
+                    TextView tv = new TextView(getContext());
+                    tv.setId(j*2);
+                    tv.setText(s[j]);
+                    //Log.d(TAG,s[j]);
+                    tv.setTextColor(Color.WHITE);
+                    tv.setLayoutParams(param);
+                    tr.addView(tv);
+                }
+                //Log.d(TAG,line);
+                t.addView(tr);
+
+                i++;
+                if(i==25){
+                    break;
+                }
+            }
+            fileReader.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

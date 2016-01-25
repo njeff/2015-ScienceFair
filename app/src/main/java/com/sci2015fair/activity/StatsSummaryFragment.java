@@ -2,14 +2,33 @@ package com.sci2015fair.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Shader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.androidplot.ui.DynamicTableModel;
+import com.androidplot.ui.SizeLayoutType;
+import com.androidplot.xy.CatmullRomInterpolator;
+import com.androidplot.xy.LineAndPointFormatter;
+import com.androidplot.xy.PointLabelFormatter;
+import com.androidplot.xy.SimpleXYSeries;
+import com.androidplot.xy.XYPlot;
+import com.androidplot.xy.XYSeries;
+import com.androidplot.xy.XYSeriesFormatter;
 import com.sci2015fair.R;
+import com.sci2015fair.filecontrolcenter.SaveLocations;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,7 +85,56 @@ public class StatsSummaryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stats_summary, container, false);
+        View view = inflater.inflate(R.layout.fragment_stats_summary, container, false);
+        XYPlot plot = (XYPlot)view.findViewById(R.id.plot);
+        int samples = 20;
+        Number numbers[][] = new Number[5][samples];
+        try{
+            //read first 20 lines of the log
+            BufferedReader fileReader = new BufferedReader(new FileReader(SaveLocations.expressionCSV));
+            int i = 0;
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                String[] s = line.split(",");
+                if(i!=0){ //skip first line
+                    for(int j = 0; j<5; j++){
+                        numbers[j][i-1] = Double.parseDouble(s[s.length-5+j]);
+                    }
+                }
+
+                i++;
+                if(i>samples){
+                    break;
+                }
+            }
+
+            int[] rainbow = getContext().getResources().getIntArray(R.array.rainbow);
+
+            fileReader.close();
+            XYSeries[] xys = new XYSeries[5];
+            String[] label = {"Happy","Neutral","Sad","Sleepy","Surprised"};
+            LineAndPointFormatter[] lpf = new LineAndPointFormatter[5];
+            for(int j =0; j<xys.length; j++){
+                xys[j] = new SimpleXYSeries(Arrays.asList(numbers[j]),
+                        SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, label[j]);
+                lpf[j] = new LineAndPointFormatter(
+                        rainbow[j], // line color
+                        rainbow[j], // point color
+                        Color.argb(0,0,0,0), // fill
+                        null);
+                Paint lineFill = new Paint();
+                lineFill.setAlpha(0);
+                lpf[j].setInterpolationParams(
+                        new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
+                plot.addSeries(xys[j], lpf[j]);
+            }
+            plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 3));
+            plot.setTicksPerRangeLabel(10);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

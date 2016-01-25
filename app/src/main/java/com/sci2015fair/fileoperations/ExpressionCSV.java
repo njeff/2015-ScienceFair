@@ -43,6 +43,7 @@ public class ExpressionCSV {
             while ((fileReader.readLine()) != null) { //count number of lines to get id
                 id++;
             }
+            fileReader.close();
 
             ConsoleLogObject clo = new ConsoleLogObject(0,"","");
             BufferedWriter bw = null;
@@ -59,7 +60,7 @@ public class ExpressionCSV {
                 bw.append("\n");
                 bw.flush();
                 bw.close();
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

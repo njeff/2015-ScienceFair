@@ -78,7 +78,7 @@ public class CameraService extends Service {
         super.onCreate();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
-        //create 16x16 window for camera feed to show onscreen wen service is started
+        //create small window for camera feed to show onscreen when service is started
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);//get system's high-level window manager for our display to be shown on all screens regardless of applications running or things displayed
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -110,11 +110,14 @@ public class CameraService extends Service {
         cParams.setJpegQuality(100);
 
         List<Camera.Size> sizes = cParams.getSupportedPictureSizes();
+        int p = 0;
         for(Camera.Size size: sizes){
             Log.d(TAG,size.height + " " + size.width);
+            if(size.height == 720) break; //find 1280x720 res
+            p++;
         }
-        cameraheightres = sizes.get(24).height;
-        camerawidthres = sizes.get(24).width;
+        cameraheightres = sizes.get(0).height;
+        camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
         mCamera.setParameters(cParams);
 
@@ -199,7 +202,7 @@ public class CameraService extends Service {
                 ConsoleLogCSVWriter.writeCsvFile("AutoCamera", String.valueOf(topBound) + "/" + cameraheightres);
                 ConsoleLogCSVWriter.writeCsvFile("AutoCamera", String.valueOf(bottomBound) + "/" + cameraheightres);
 
-                if(!taken && verify == 3){ //has one face been seen 3 times in a row?
+                if(!taken && verify == 2){ //has one face been seen 2 times in a row?
                     trigger = true;
                     mCamera.takePicture(null, null, mPicture);
                     Log.d(TAG, "Taking Picture...");

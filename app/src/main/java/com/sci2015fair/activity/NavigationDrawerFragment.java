@@ -217,13 +217,14 @@ public class NavigationDrawerFragment extends Fragment {
                 break;
             case 2: selectedFragment = new ConsoleLogFragment();
                 break;
-            case 3: selectedFragment = new ItemFragment();
+            case 3: selectedFragment = new AboutThisAppFragment();
+                break;
+            case 4: selectedFragment = new AboutUsFragment();
                 break;
             case 5: selectedFragment = new SettingsFragment();//array value 4, opens fragment SettingsFragment
                 break;
             default://if a listed title does not have a fragment assigned to it, no new fragment will be opened
                 break;
-
         }
         if (selectedFragment != null) {//"if" statement is just a safeguard in the event that a button is not assigned to a case in the switch above, and a fragment is therefore not assigned
             FragmentManager fragmentManager = getFragmentManager();

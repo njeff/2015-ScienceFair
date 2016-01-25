@@ -94,7 +94,7 @@ public class Classify extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            originalImage.delete(); //remove noncrop
             // load cascade file from application resources
             // needs to write resource to file to get a valid path
             InputStream is = getResources().openRawResource(R.raw.haarcascade_frontalface_alt);
@@ -169,9 +169,9 @@ public class Classify extends Service {
             int[] out; //data from clandmark
             int[][] fOut = new int[21][2]; //formatted into x, y
 
+            int[] bbox = new int[8];
             for(Rect rect : faceDetections.toArray()){
                 rect.height *= 1.15; //increase height slightly to compensate for smaller window
-                int[] bbox = new int[8];
                 bbox[0] = rect.x;
                 bbox[1] = rect.y;
                 bbox[2] = rect.x+rect.width;
@@ -199,6 +199,7 @@ public class Classify extends Service {
             }
             Bitmap bmp = Bitmap.createBitmap(image.width(),image.height(),Bitmap.Config.ARGB_8888); //convert back
             Utils.matToBitmap(image, bmp);
+            bmp = Bitmap.createBitmap(bmp,bbox[0],bbox[1],bbox[4]-bbox[0],bbox[5]-bbox[1]);
             SavePictures.saveImage(bmp, true, getApplicationContext());
             //land.delete(); //delete after it is loaded
             //originalImage.delete();//remove old image

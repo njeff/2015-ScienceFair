@@ -1,10 +1,49 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ap="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.sci2015fair.activity.StatsSummaryFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- TODO: Update blank fragment layout
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="@string/stats" />
+    -->
+    <com.androidplot.xy.XYPlot
+        android:id="@+id/plot"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        ap:labelTextColor="#111111"
+        ap:label="Mood Plot"
+        ap:rangeLabel="Mood"
+        ap:domainLabel="Time"
+        ap:borderColor="#888888"
+        ap:backgroundColor="#FFFFFF"
+        ap:graphBackgroundColor="#FFFFFF"
+        ap:gridBackgroundColor="#FFFFFF"
+        ap:gridPaddingLeft="10dp"
+        ap:gridPaddingRight="10dp"
+        ap:gridPaddingTop="30dp"
+        ap:gridPaddingBottom="30dp"
+        ap:labelTextSize="20sp"
+        ap:rangeLabelTextSize="13sp"
+        ap:domainLabelTextSize="13sp"
+        ap:graphMarginTop="20dp"
+        ap:graphMarginBottom="20dp"
+        ap:graphMarginLeft="5dp"
+        ap:graphMarginRight="5dp"
+        ap:graphDomainLineColor="#FFFFFF"
+        ap:graphDomainLineThickness="1dp"
+        ap:graphRangeLineColor="#666666"
+        ap:graphRangeLineThickness="1dp"
+        ap:rangeTickLabelTextSize="10sp"
+        ap:rangeOriginTickLabelTextSize="15sp"
+        ap:domainTickLabelTextSize="10sp"
+        ap:domainOriginTickLabelTextSize="15sp"
+        ap:legendTextSize="8sp"
+        ap:legendIconHeight="10dp"
+        ap:legendIconWidth="10dp"
+        ap:legendHeight="25dp"
+        ap:legendAnchorPosition="right_bottom"/>
 
 </FrameLayout>

@@ -3,7 +3,8 @@
     <style name="BaseTheme"
         parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
-
+        <item name="colorPrimary">@color/cy500</item>
+        <item name="colorPrimaryDark">@color/cy900</item>
 
     </style>
 

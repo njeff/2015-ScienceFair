@@ -18,7 +18,7 @@ import com.sci2015fair.R;
 
 import com.sci2015fair.service.CameraService;
 
-public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
+public class MainActivity extends AppCompatActivity{
 
     private static final String TAG = "MainActivity";
     
@@ -44,15 +44,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-    }
-
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position))
-                .commit();
     }
 
     @Override
@@ -143,47 +134,5 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
     {
         super.onDestroy();
         stopService(new Intent(getApplicationContext(), CameraService.class));
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {//called once a fragment is associated with this activity (MainActivity)
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(//calls method onSectionAttached to set toolbar title (see method comments for more info)
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
     }
 }
