@@ -24,7 +24,7 @@ import java.util.Date;
  *
  * Created by Jeffrey on 9/26/2015.
  */
-public class CameraSavePicturesService {
+public class CameraSavePictures {
 
     static final String TAG = "sd";
     //http://stackoverflow.com/questions/902089/how-to-tell-if-the-sdcard-is-mounted-in-android

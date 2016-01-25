@@ -113,6 +113,7 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_section3),
                         getString(R.string.title_section4),
                         getString(R.string.title_section5),
+                        "Map",
 
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
@@ -220,6 +221,8 @@ public class NavigationDrawerFragment extends Fragment {
             case 3: selectedFragment = new ItemFragment();
                 break;
             case 5: selectedFragment = new SettingsFragment();//array value 4, opens fragment SettingsFragment
+                break;
+            case 6: selectedFragment = new MapsFragment();
                 break;
             default://if a listed title does not have a fragment assigned to it, no new fragment will be opened
                 break;
