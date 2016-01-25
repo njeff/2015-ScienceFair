@@ -88,7 +88,7 @@ public class CameraService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,//not clickable by user
                 PixelFormat.TRANSLUCENT);//?
 
-        params.gravity = Gravity.TOP | Gravity.LEFT;//sets origin orientation of WindowManager
+        params.gravity = Gravity.BOTTOM | Gravity.RIGHT;//sets origin orientation of WindowManager
         params.x = 0;//x position for window (measured from top left)
         params.y = 0;//y position for window
 
@@ -113,7 +113,7 @@ public class CameraService extends Service {
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
-        //mCamera.setParameters(cParams);
+        mCamera.setParameters(cParams);
 
         mPreview = new CameraPreview(this, mCamera);
         windowManager.addView(mPreview, params);

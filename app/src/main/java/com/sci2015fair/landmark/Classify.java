@@ -94,7 +94,6 @@ public class Classify extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            originalImage.delete(); //remove noncrop
             // load cascade file from application resources
             // needs to write resource to file to get a valid path
             InputStream is = getResources().openRawResource(R.raw.haarcascade_frontalface_alt);
@@ -132,94 +131,95 @@ public class Classify extends Service {
             faceDetector.detectMultiScale(image, faceDetections); //detect faces
 
             Log.d(TAG, String.format("Detected %d faces", faceDetections.toArray().length));
-
-            Mat temp = image.clone();
-            Imgproc.cvtColor(image,temp,Imgproc.COLOR_BGR2GRAY);
-            temp.convertTo(temp, CvType.CV_8U); //convert to grayscale
-            byte[] data = new byte[temp.rows()*temp.cols()]; //save into continuous array
-            for(int y = 0; y<temp.rows(); y++){
-                for(int x = 0; x<temp.cols(); x++){
-                    data[y*temp.cols()+x] = (byte)temp.get(y,x)[0];
-                }
-            }
-
-            //load flandmark model
-            InputStream ins = getResources().openRawResource(R.raw.frontalaflw);
-            File landDir = getDir("flandmark", Context.MODE_PRIVATE);
-            File land = new File(landDir, "flandmark_model.xml");
-            if(!land.exists()){
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(land);
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = ins.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
+            if(faceDetections.toArray().length > 0){ //if there were faces
+                Mat temp = image.clone();
+                Imgproc.cvtColor(image,temp,Imgproc.COLOR_BGR2GRAY);
+                temp.convertTo(temp, CvType.CV_8U); //convert to grayscale
+                byte[] data = new byte[temp.rows()*temp.cols()]; //save into continuous array
+                for(int y = 0; y<temp.rows(); y++){
+                    for(int x = 0; x<temp.cols(); x++){
+                        data[y*temp.cols()+x] = (byte)temp.get(y,x)[0];
                     }
-                    ins.close();
-                    fos.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            } else {
-                Log.i(TAG, "Landmark file exists.");
-            }
 
-            String landPath = land.getAbsolutePath(); //path to model
-            int[] out; //data from clandmark
-            int[][] fOut = new int[21][2]; //formatted into x, y
-
-            int[] bbox = new int[8];
-            for(Rect rect : faceDetections.toArray()){
-                rect.height *= 1.15; //increase height slightly to compensate for smaller window
-                bbox[0] = rect.x;
-                bbox[1] = rect.y;
-                bbox[2] = rect.x+rect.width;
-                bbox[3] = rect.y;
-                bbox[4] = rect.x+rect.width;
-                bbox[5] = rect.y+rect.height;
-                bbox[6] = rect.x;
-                bbox[7] = rect.y+rect.height;
-
-                for(int i = 0; i<8; i+=2){ //print out bounding box
-                    Log.d(TAG, bbox[i] + ", " + bbox[i+1]);
+                //load flandmark model
+                InputStream ins = getResources().openRawResource(R.raw.frontalaflw);
+                File landDir = getDir("flandmark", Context.MODE_PRIVATE);
+                File land = new File(landDir, "flandmark_model.xml");
+                if(!land.exists()){
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(land);
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = ins.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
+                        ins.close();
+                        fos.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.i(TAG, "Landmark file exists.");
                 }
-                Imgproc.rectangle(image, new Point(bbox[0], bbox[1]), new Point(bbox[4], bbox[5]),
-                        new Scalar(255, 0, 0)); //draw bounding box
 
-                out = runLandmarks(image.width(),image.height(),bbox,data,landPath); //call clandmark code
-                for(int i = 0; i<out.length; i+=2){ //display points
-                    Log.d(TAG, out[i] + ", " + out[i + 1]);
-                    fOut[i/2][0] = out[i];
-                    fOut[i/2][1] = out[i+1];
-                    Imgproc.rectangle(image, new Point(out[i], out[i+1]), new Point(out[i] + 2, out[i+1] + 2),
-                            new Scalar(0, 255, 0));
+                String landPath = land.getAbsolutePath(); //path to model
+                int[] out; //data from clandmark
+                int[][] fOut = new int[21][2]; //formatted into x, y
+
+                int[] bbox = new int[8];
+                for(Rect rect : faceDetections.toArray()){
+                    rect.height *= 1.15; //increase height slightly to compensate for smaller window
+                    bbox[0] = rect.x;
+                    bbox[1] = rect.y;
+                    bbox[2] = rect.x+rect.width;
+                    bbox[3] = rect.y;
+                    bbox[4] = rect.x+rect.width;
+                    bbox[5] = rect.y+rect.height;
+                    bbox[6] = rect.x;
+                    bbox[7] = rect.y+rect.height;
+
+                    for(int i = 0; i<8; i+=2){ //print out bounding box
+                        Log.d(TAG, bbox[i] + ", " + bbox[i+1]);
+                    }
+                    Imgproc.rectangle(image, new Point(bbox[0], bbox[1]), new Point(bbox[4], bbox[5]),
+                            new Scalar(255, 0, 0)); //draw bounding box
+
+                    out = runLandmarks(image.width(),image.height(),bbox,data,landPath); //call clandmark code
+                    for(int i = 0; i<out.length; i+=2){ //display points
+                        Log.d(TAG, out[i] + ", " + out[i + 1]);
+                        fOut[i/2][0] = out[i];
+                        fOut[i/2][1] = out[i+1];
+                        Imgproc.rectangle(image, new Point(out[i], out[i+1]), new Point(out[i] + 2, out[i+1] + 2),
+                                new Scalar(0, 255, 0));
+                    }
+                    break; //only analyze the first face
                 }
-                break; //only analyze the first face
-            }
-            Bitmap bmp = Bitmap.createBitmap(image.width(),image.height(),Bitmap.Config.ARGB_8888); //convert back
-            Utils.matToBitmap(image, bmp);
-            bmp = Bitmap.createBitmap(bmp,bbox[0],bbox[1],bbox[4]-bbox[0],bbox[5]-bbox[1]);
-            SavePictures.saveImage(bmp, true, getApplicationContext());
-            //land.delete(); //delete after it is loaded
-            //originalImage.delete();//remove old image
+                Bitmap bmp = Bitmap.createBitmap(image.width(),image.height(),Bitmap.Config.ARGB_8888); //convert back
+                Utils.matToBitmap(image, bmp);
+                bmp = Bitmap.createBitmap(bmp,bbox[0],bbox[1],bbox[4]-bbox[0],bbox[5]-bbox[1]);
+                SavePictures.saveImage(bmp, true, getApplicationContext());
+                //land.delete(); //delete after it is loaded
+                //originalImage.delete();//remove old image
 
-            File dir = SaveLocations.dataFolder;
-            File arff = SaveLocations.tempARFF;
-            if (! dir.exists()){
-                if (! dir.mkdirs()){
-                    Log.d(TAG, "failed to create directory");
+                File dir = SaveLocations.dataFolder;
+                File arff = SaveLocations.tempARFF;
+                if (! dir.exists()){
+                    if (! dir.mkdirs()){
+                        Log.d(TAG, "failed to create directory");
+                    }
                 }
+                try {
+                    CalcAttributes cal = new CalcAttributes(fOut); //save attributes
+                    cal.writeAttr(arff.getAbsolutePath());
+                } catch (Exception e){
+                    Log.e(TAG,"...");
+                }
+                Expression exp = new Expression(R.raw.edit, getApplicationContext()); //load up machine learning classifier
+                exp.getExpression(arff.getAbsolutePath(),arff.getAbsolutePath()); //get the
             }
-            try {
-                CalcAttributes cal = new CalcAttributes(fOut); //save attributes
-                cal.writeAttr(arff.getAbsolutePath());
-            } catch (Exception e){
-                Log.e(TAG,"...");
-            }
-            Expression exp = new Expression(R.raw.edit, getApplicationContext()); //load up machine learning classifier
-            exp.getExpression(arff.getAbsolutePath(),arff.getAbsolutePath()); //get the
-
+            originalImage.delete(); //remove noncrop
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
             stopSelf(msg.arg1);
