@@ -29,4 +29,5 @@
         It creates a service that launches on every unlock that takes a picture of the user.
         \n\n\tService is automatically destroyed after 10 seconds if no face is detected.
         \n\n\tIt uses OpenCV for detecting the face bounding box and the clandmark library for facial landmark detection.</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

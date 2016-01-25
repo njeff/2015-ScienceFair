@@ -92,16 +92,8 @@ public class CameraService extends Service {
         params.x = 0;//x position for window (measured from top left)
         params.y = 0;//y position for window
 
+        openCamera();
 
-        if(checkCameraHardware(this)) {
-            releaseCamera();
-            try {
-                mCamera = Camera.open(findFrontFacingCamera());
-                mCamera.setFaceDetectionListener(faceDetectionListener);
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         //enable autofocus
@@ -116,10 +108,12 @@ public class CameraService extends Service {
             if(size.height == 720) break; //find 1280x720 res
             p++;
         }
+        Log.d(TAG, "Resolution supported: " + sizes.get(0).height);
+        Log.d(TAG, "Resolution supported: " + sizes.get(0).width);
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
-        mCamera.setParameters(cParams);
+        //mCamera.setParameters(cParams);
 
         mPreview = new CameraPreview(this, mCamera);
         windowManager.addView(mPreview, params);
@@ -144,7 +138,6 @@ public class CameraService extends Service {
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
-
     /**
      * OpenCV Callback
      */
@@ -363,18 +356,43 @@ public class CameraService extends Service {
         }
     }
 
+
+    public void openCamera() {
+        if(checkForFrontCamera(this)) {
+            releaseCamera();//safety measure in case app was holding camera before for any reason
+            try {
+                Log.d("CameraService", "Thread is sleeping...");
+                Thread.sleep(4000);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            boolean isCameraInUse = true;
+            while (isCameraInUse == true) {
+                try {
+                    mCamera = Camera.open(findFrontFacingCamera());
+                    mCamera.setFaceDetectionListener(faceDetectionListener);
+                } catch (RuntimeException e){
+                    //e.printStackTrace();
+                }
+                if (mCamera != null) {
+                    isCameraInUse = false;
+                }
+            }
+
+        }
+    }
+
     /**
-     * Check for front-facing camera.
+     * Checks for front-facing camera.
      * @param context
      * @return boolean if front-facing camera exists
      */
-    private boolean checkCameraHardware(Context context) {
+    private boolean checkForFrontCamera(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)){
-            // this device has a camera
             Log.d(TAG,"Camera Found");
             return true;
         } else {
-            // no camera on this device
             return false;
         }
     }

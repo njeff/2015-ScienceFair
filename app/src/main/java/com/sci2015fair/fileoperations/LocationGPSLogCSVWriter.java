@@ -24,8 +24,8 @@ public class LocationGPSLogCSVWriter {
     private static final String NEW_LINE_SEPARATOR = "\n";
     private static final File DFLocationGPSLogCSV = SaveLocations.DFLocationGPSLogCSV;
     //CSV file header
-    private static final String FILE_HEADER0 = "Id,Date,Time,Latitude,Longitude,Accuracy,Altitude,Bearing,Data Provider,Notes";
-    private static final String FILE_HEADER1 = ",,,,,(+-1STD DEV in Meters),,(In Degrees),,";
+    private static final String FILE_HEADER0 = "Id,Date,Time,Unix Time,Latitude,Longitude,Accuracy,Speed,Altitude,Bearing,Data Provider,Notes";
+    private static final String FILE_HEADER1 = ",,,(Milliseconds since 1/1/1970 00:00),,,(+-1STD DEV in Meters),Meters/Sec,,(In Degrees),,";
 
     public static void writeNewEntry(Location currentLocation, String notes) {
         long id = -1;
@@ -61,11 +61,15 @@ public class LocationGPSLogCSVWriter {
             fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(getTime(currentLocation));
             fileWriter.append(COMMA_DELIMITER);
+            fileWriter.append(String.valueOf(currentLocation.getTime()));
+            fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(String.valueOf(currentLocation.getLatitude()));
             fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(String.valueOf(currentLocation.getLongitude()));
             fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(String.valueOf(currentLocation.getAccuracy()));
+            fileWriter.append(COMMA_DELIMITER);
+            fileWriter.append(String.valueOf(currentLocation.getSpeed()));
             fileWriter.append(COMMA_DELIMITER);
             fileWriter.append(String.valueOf(currentLocation.getAltitude()));
             fileWriter.append(COMMA_DELIMITER);
@@ -94,14 +98,14 @@ public class LocationGPSLogCSVWriter {
     }
 
     public static String getDate(Location currentLocation) {
-        DateFormat tf = new SimpleDateFormat("HH:mm:ss");
+        DateFormat tf = new SimpleDateFormat("MM/dd/yy");
         Date dateobj = new Date(currentLocation.getTime());
         String date = tf.format(dateobj);
         return date;
     }
 
     public static String getTime(Location currentLocation) {
-        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        DateFormat df = new SimpleDateFormat("HH:mm:ss");
         Date dateobj = new Date(currentLocation.getTime());
         String time = df.format(dateobj);
         return time;
