@@ -7,6 +7,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -25,9 +26,14 @@ import com.androidplot.xy.XYSeries;
 import com.androidplot.xy.XYSeriesFormatter;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
+import com.sci2015fair.fileoperations.ReverseLineInputStream;
+
+import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 /**
@@ -90,8 +96,8 @@ public class StatsSummaryFragment extends Fragment {
         int samples = 20;
         Number numbers[][] = new Number[5][samples];
         try{
-            //read first 20 lines of the log
-            BufferedReader fileReader = new BufferedReader(new FileReader(SaveLocations.expressionCSV));
+            //read last 20 lines of the log
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
             int i = 0;
             String line;
             while ((line = fileReader.readLine()) != null) {
@@ -107,13 +113,31 @@ public class StatsSummaryFragment extends Fragment {
                     break;
                 }
             }
+            fileReader.close();
 
             int[] rainbow = getContext().getResources().getIntArray(R.array.rainbow);
 
-            fileReader.close();
             XYSeries[] xys = new XYSeries[5];
             String[] label = {"Happy","Neutral","Sad","Sleepy","Surprised"};
             LineAndPointFormatter[] lpf = new LineAndPointFormatter[5];
+            Number[] avgE = new Number[numbers[0].length];
+            for(int j =0; j<numbers[0].length; j++){ //weighted average line
+                avgE[j] = numbers[0][j].doubleValue()*0.9
+                        +numbers[1][j].doubleValue()*0.5
+                        +numbers[2][j].doubleValue()*0.1
+                        +numbers[3][j].doubleValue()*0.2
+                        +numbers[4][j].doubleValue()*1;
+            }
+            SimpleXYSeries avg = new SimpleXYSeries(Arrays.asList(avgE),
+                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Average");
+            LineAndPointFormatter lf = new LineAndPointFormatter(rainbow[0], // line color
+                    rainbow[0], // point color
+                    Color.argb(0,0,0,0), // fill
+                    null);
+            lf.setInterpolationParams(
+                    new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
+            plot.addSeries(avg,lf);
+            /*
             for(int j =0; j<xys.length; j++){
                 xys[j] = new SimpleXYSeries(Arrays.asList(numbers[j]),
                         SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, label[j]);
@@ -128,6 +152,7 @@ public class StatsSummaryFragment extends Fragment {
                         new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
                 plot.addSeries(xys[j], lpf[j]);
             }
+            */
             plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 3));
             plot.setTicksPerRangeLabel(10);
         } catch (Exception e){
