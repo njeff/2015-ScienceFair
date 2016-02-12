@@ -38,6 +38,9 @@ import java.io.InputStream;
 
 /**
  * Service to classify photos using OpenCV
+ *
+ * TODO:
+ * - fix missing linked gnu library (exact error unsure)
  */
 public class Classify extends Service {
     private final String TAG = "OCV";

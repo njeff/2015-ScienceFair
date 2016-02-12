@@ -43,6 +43,11 @@ import java.util.Arrays;
  * to handle interaction events.
  * Use the {@link StatsSummaryFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ *
+ * TODO:
+ * - add graph of user movement
+ * - combine graphs? (will tie into overall mood)
  */
 public class StatsSummaryFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match

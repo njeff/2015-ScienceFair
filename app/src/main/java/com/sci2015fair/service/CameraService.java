@@ -4,6 +4,10 @@ package com.sci2015fair.service;
  * The service that is automatically called when the phone is unlocked
  * Takes a photo of the user
  *
+ * TODO:
+ * - fix Android 6.0+ screen permissions
+ * - fix the setParameters call on certain phones
+ *
  * Derived from:
  * http://www.piwai.info/chatheads-basics/
  */
