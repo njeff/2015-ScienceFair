@@ -33,7 +33,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,12 +51,12 @@ import java.util.Arrays;
  * Use the {@link StatsSummaryFragment#newInstance} factory method to
  * create an instance of this fragment.
  *
- *
  * TODO:
- * - add graph of user movement
  * - combine graphs? (will tie into overall mood)
  */
 public class StatsSummaryFragment extends Fragment {
+    private static String TAG = "Stats";
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -97,51 +105,63 @@ public class StatsSummaryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stats_summary, container, false);
         XYPlot plot = (XYPlot)view.findViewById(R.id.plot);
-        int samples = 20;
-        Number numbers[][] = new Number[5][samples];
-        Number dist[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+        int samples = 100;
+        ArrayList<ArrayList<Number>> emotion = new ArrayList<ArrayList<Number>>();
+        for(int i = 0; i<5; i++)
+            emotion.add(new ArrayList<Number>());
+        Number dist[] = {0,0,0,0,0,0,0};
         try{
-            //read last 20 lines of the expression log
-            BufferedReader fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
-            int i = samples-1;
+            //read last week of the distance log
+            String oldestdate = "";
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.TotalDistanceLog)));
             String line;
-            while ((line = fileReader.readLine()) != null) {
-                String[] s = line.split(",");
-                if(!s[0].equals("ID")){
-                    for(int j = 0; j<5; j++){
-                        numbers[j][i] = Double.parseDouble(s[s.length-5+j]);
-                    }
-                }
-                i--;
-                if(i<0){
-                    break;
-                }
-            }
-            fileReader.close();
-            //read last 20 lines of the position log
-            fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.TotalDistanceLog)));
-            i = samples-1;
+            int i = 7-1; //one week's data
             while ((line = fileReader.readLine()) != null) {
                 String[] s = line.split(",");
                 if(!s[0].equals("Date")){
-                    dist[i] = Math.log10(Math.abs(Double.parseDouble(s[1])))/2.0; //get the delta
+                    dist[i] = Math.log10(Math.abs(Double.parseDouble(s[1])))/2.0; //get the delta or dist
+                    oldestdate = s[0]; //record oldest date
                 }
                 i--;
-                if(i<0){
+                if(i<0)
                     break;
-                }
             }
             fileReader.close();
+            Log.d(TAG,oldestdate);
+            DateFormat dfm = new SimpleDateFormat("MM/dd/yy");
+            long oldtime = dfm.parse(oldestdate).getTime();
 
+            //read expression log backwards up to last distance log
+            fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
+            i = samples-1;
+            long currentUT = 0;
+            while ((line = fileReader.readLine()) != null) {
+                String[] s = line.split(",");
+                if(!s[0].equals("ID")){
+                    currentUT = dfm.parse(s[1]).getTime(); //unix time * 1000
+                    for(int j = 0; j<5; j++)
+                        emotion.get(j).add(Double.parseDouble(s[s.length-5+j]));
+                }
+                i--;
+                if(i<0||currentUT<oldtime) //read values up to the oldest date from the distance log
+                    break;
+            }
+            fileReader.close();
+            for(int q = 0; q<5; q++) //flip around so most recent values on on the right of graph
+                Collections.reverse(emotion.get(q));
+
+            //colors
             int[] rainbow = getContext().getResources().getIntArray(R.array.rainbow);
+
             //averaged line
-            Number[] avgE = new Number[numbers[0].length];
-            for(int j =0; j<numbers[0].length; j++){ //weighted average line
-                avgE[j] = numbers[0][j].doubleValue()*0.9
-                        +numbers[1][j].doubleValue()*0.5
-                        +numbers[2][j].doubleValue()*0.1
-                        +numbers[3][j].doubleValue()*0.2
-                        +numbers[4][j].doubleValue()*1;
+            Number[] avgE = new Number[emotion.get(0).size()];
+            for(int j =0; j<emotion.get(0).size(); j++){ //weighted average line
+                avgE[j] = emotion.get(0).get(j).doubleValue()*0.9
+                        +emotion.get(1).get(j).doubleValue()*0.5
+                        +emotion.get(2).get(j).doubleValue()*0.1
+                        +emotion.get(3).get(j).doubleValue()*0.2
+                        +emotion.get(4).get(j).doubleValue()*1;
             }
             SimpleXYSeries avg = new SimpleXYSeries(Arrays.asList(avgE),
                     SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Average");
@@ -151,11 +171,15 @@ public class StatsSummaryFragment extends Fragment {
                     null);
             lf.setInterpolationParams( //smoothing
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
-            plot.addSeries(avg,lf); //smoothing
+            plot.addSeries(avg,lf);
 
             //movement line
-            SimpleXYSeries movement = new SimpleXYSeries(Arrays.asList(dist),
-                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Distance");
+            Number[] xaxis = new Number[7];
+            for(int q = 0; q<7; q++)
+                xaxis[q] = (double)(q*emotion.get(0).size())/7.0;
+
+            SimpleXYSeries movement = new SimpleXYSeries(Arrays.asList(xaxis),
+                    Arrays.asList(dist), "Distance");
             LineAndPointFormatter lf2 = new LineAndPointFormatter(rainbow[1], // line color
                     rainbow[1], // point color
                     Color.argb(0,0,0,0), // fill
@@ -164,25 +188,6 @@ public class StatsSummaryFragment extends Fragment {
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
             plot.addSeries(movement, lf2);
 
-            /*
-            String[] label = {"Happy","Neutral","Sad","Sleepy","Surprised"};
-            LineAndPointFormatter[] lpf = new LineAndPointFormatter[5];
-            XYSeries[] xys = new XYSeries[5];
-            for(int j =0; j<xys.length; j++){
-                xys[j] = new SimpleXYSeries(Arrays.asList(numbers[j]),
-                        SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, label[j]);
-                lpf[j] = new LineAndPointFormatter(
-                        rainbow[j], // line color
-                        rainbow[j], // point color
-                        Color.argb(0,0,0,0), // fill
-                        null);
-                Paint lineFill = new Paint();
-                lineFill.setAlpha(0);
-                lpf[j].setInterpolationParams(
-                        new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
-                plot.addSeries(xys[j], lpf[j]);
-            }
-            */
             plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 3));
             plot.setTicksPerRangeLabel(10);
         } catch (Exception e){
