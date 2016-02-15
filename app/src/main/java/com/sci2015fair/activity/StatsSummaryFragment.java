@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.androidplot.ui.DynamicTableModel;
 import com.androidplot.ui.SizeLayoutType;
@@ -27,8 +28,6 @@ import com.androidplot.xy.XYSeriesFormatter;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
 import com.sci2015fair.fileoperations.ReverseLineInputStream;
-
-import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -100,31 +99,42 @@ public class StatsSummaryFragment extends Fragment {
         XYPlot plot = (XYPlot)view.findViewById(R.id.plot);
         int samples = 20;
         Number numbers[][] = new Number[5][samples];
+        Number dist[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
         try{
-            //read last 20 lines of the log
+            //read last 20 lines of the expression log
             BufferedReader fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
-            int i = 0;
+            int i = samples-1;
             String line;
             while ((line = fileReader.readLine()) != null) {
                 String[] s = line.split(",");
-                if(i!=0){ //skip first line
+                if(!s[0].equals("ID")){
                     for(int j = 0; j<5; j++){
-                        numbers[j][i-1] = Double.parseDouble(s[s.length-5+j]);
+                        numbers[j][i] = Double.parseDouble(s[s.length-5+j]);
                     }
                 }
-
-                i++;
-                if(i>samples){
+                i--;
+                if(i<0){
+                    break;
+                }
+            }
+            fileReader.close();
+            //read last 20 lines of the position log
+            fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.TotalDistanceLog)));
+            i = samples-1;
+            while ((line = fileReader.readLine()) != null) {
+                String[] s = line.split(",");
+                if(!s[0].equals("Date")){
+                    dist[i] = Math.log10(Math.abs(Double.parseDouble(s[1])))/2.0; //get the delta
+                }
+                i--;
+                if(i<0){
                     break;
                 }
             }
             fileReader.close();
 
             int[] rainbow = getContext().getResources().getIntArray(R.array.rainbow);
-
-            XYSeries[] xys = new XYSeries[5];
-            String[] label = {"Happy","Neutral","Sad","Sleepy","Surprised"};
-            LineAndPointFormatter[] lpf = new LineAndPointFormatter[5];
+            //averaged line
             Number[] avgE = new Number[numbers[0].length];
             for(int j =0; j<numbers[0].length; j++){ //weighted average line
                 avgE[j] = numbers[0][j].doubleValue()*0.9
@@ -139,10 +149,25 @@ public class StatsSummaryFragment extends Fragment {
                     rainbow[0], // point color
                     Color.argb(0,0,0,0), // fill
                     null);
-            lf.setInterpolationParams(
+            lf.setInterpolationParams( //smoothing
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
-            plot.addSeries(avg,lf);
+            plot.addSeries(avg,lf); //smoothing
+
+            //movement line
+            SimpleXYSeries movement = new SimpleXYSeries(Arrays.asList(dist),
+                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Distance");
+            LineAndPointFormatter lf2 = new LineAndPointFormatter(rainbow[1], // line color
+                    rainbow[1], // point color
+                    Color.argb(0,0,0,0), // fill
+                    null);
+            lf2.setInterpolationParams( //smoothing
+                    new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
+            plot.addSeries(movement, lf2);
+
             /*
+            String[] label = {"Happy","Neutral","Sad","Sleepy","Surprised"};
+            LineAndPointFormatter[] lpf = new LineAndPointFormatter[5];
+            XYSeries[] xys = new XYSeries[5];
             for(int j =0; j<xys.length; j++){
                 xys[j] = new SimpleXYSeries(Arrays.asList(numbers[j]),
                         SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, label[j]);

@@ -1,4 +1,4 @@
-package com.sci2015fair.programlogic;
+package com.sci2015fair.distance;
 
 import android.location.Location;
 

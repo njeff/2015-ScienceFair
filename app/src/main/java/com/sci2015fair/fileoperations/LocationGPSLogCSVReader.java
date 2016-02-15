@@ -1,11 +1,9 @@
 package com.sci2015fair.fileoperations;
 
 import android.location.Location;
-import android.os.Environment;
 import android.util.Log;
 
-import com.sci2015fair.filecontrolcenter.SaveLocations;
-import com.sci2015fair.programlogic.LocationIDObject;
+import com.sci2015fair.distance.LocationIDObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,9 +13,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Mitchell on 12/30/2015.

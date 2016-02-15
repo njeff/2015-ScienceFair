@@ -1,10 +1,9 @@
-package com.sci2015fair.programlogic;
+package com.sci2015fair.distance;
 
 import android.location.Location;
 import android.util.Log;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

@@ -1,7 +1,6 @@
 package com.sci2015fair.activity;
 
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,10 +18,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
-import com.sci2015fair.programlogic.LocationIDObject;
+import com.sci2015fair.distance.LocationIDObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static com.sci2015fair.fileoperations.LocationGPSLogCSVReader.readLocationCSVFile;
 

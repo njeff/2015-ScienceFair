@@ -3,7 +3,9 @@
     xmlns:ap="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sci2015fair.activity.StatsSummaryFragment">
+    tools:context="com.sci2015fair.activity.StatsSummaryFragment"
+    android:id="@+id/statslayout"
+    android:background="#ffffff">
 
     <!-- TODO: Update blank fragment layout
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
@@ -12,12 +14,12 @@
     <com.androidplot.xy.XYPlot
         android:id="@+id/plot"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="491dp"
         ap:labelTextColor="#111111"
         ap:label="Mood Plot"
         ap:rangeLabel="Mood"
         ap:domainLabel="Time"
-        ap:borderColor="#888888"
+        ap:borderColor="#FFFFFF"
         ap:backgroundColor="#FFFFFF"
         ap:graphBackgroundColor="#FFFFFF"
         ap:gridBackgroundColor="#FFFFFF"
@@ -28,7 +30,7 @@
         ap:labelTextSize="20sp"
         ap:rangeLabelTextSize="13sp"
         ap:domainLabelTextSize="13sp"
-        ap:graphMarginTop="10dp"
+        ap:graphMarginTop="20dp"
         ap:graphMarginBottom="20dp"
         ap:graphMarginLeft="5dp"
         ap:graphMarginRight="5dp"
@@ -44,6 +46,7 @@
         ap:legendIconHeight="10dp"
         ap:legendIconWidth="10dp"
         ap:legendHeight="25dp"
-        ap:legendAnchorPosition="right_bottom"/>
+        ap:legendAnchorPosition="right_bottom"
+        android:layout_gravity="center" />
 
 </FrameLayout>
