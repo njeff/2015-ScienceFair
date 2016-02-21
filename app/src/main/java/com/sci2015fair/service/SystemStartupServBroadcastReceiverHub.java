@@ -14,28 +14,17 @@ public class SystemStartupServBroadcastReceiverHub extends BroadcastReceiver {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         System.out.println(intent.getAction());
-//        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {//has the phone's boot sequence completed?
         if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {//has the phone's boot sequence completed?
-//        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) ||//has the phone's boot sequence completed?
-//                intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {//have we logged in?
-            Log.d("YEAH", "BOOTBOOTBOOTBOOTBOOTBOOTBOOT");
+            Log.d("YEAH", "BOOT");
+
             Intent checkFiles = new Intent(context, CheckFilesPresentService.class);//create intent
-            context.startService(checkFiles);
+            context.startService(checkFiles);//start services that run on starting up the app
 
             Intent takePicture = new Intent(context, CameraService.class);//create intent
-            context.startService(takePicture);//start services that run on starting up the app
-//            throw new UnsupportedOperationException("Not yet implemented");
-//
-//
-//
-//
-//
-////            Intent camServ = new Intent(context, com.sci2015fair.service.Notifications.class);//create intent
+            context.startService(takePicture);
+
             Intent LocServ = new Intent(context, LocationGPSLogPersistentService.class);//create intent
-            context.startService(LocServ);//start CameraService
-//
-////            camServ.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-////            context.startActivity(camServ);
+            context.startService(LocServ);
         }
     }
 }

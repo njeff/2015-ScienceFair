@@ -129,5 +129,4 @@ public class DistanceCalculator extends WakefulBroadcastReceiver{
         }
         Log.d(TAG,"Done!");
     }
-
 }

@@ -3,6 +3,7 @@ package com.sci2015fair.landmark;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -222,7 +223,11 @@ public class Classify extends Service {
                 Expression exp = new Expression(R.raw.edit, getApplicationContext()); //load up machine learning classifier
                 exp.getExpression(arff.getAbsolutePath(),arff.getAbsolutePath()); //get the
             }
-            originalImage.delete(); //remove noncrop
+            SharedPreferences settings = getSharedPreferences("Settings", MODE_PRIVATE);
+            boolean developer = settings.getBoolean("developerMode", false);
+            if(!developer){
+                originalImage.delete(); //remove noncrop
+            }
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
             stopSelf(msg.arg1);

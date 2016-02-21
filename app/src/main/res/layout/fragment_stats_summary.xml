@@ -46,6 +46,7 @@
         ap:legendIconHeight="10dp"
         ap:legendIconWidth="10dp"
         ap:legendHeight="25dp"
+        ap:legendTextColor="#666666"
         ap:legendAnchorPosition="right_bottom"
         android:layout_gravity="center" />
 

@@ -19,6 +19,7 @@ import java.util.Date;
  * Created by Mitchell on 12/30/2015.
  */
 public class LocationGPSLogCSVReader {
+    private static String TAG = "GPSCSV";
     private static final String COMMA_DELIMITER = ",";
     public static ArrayList<LocationIDObject> readLocationCSVFile(File fileToRead) {
         String line;
@@ -36,7 +37,7 @@ public class LocationGPSLogCSVReader {
             while ((line = fileReader.readLine()) != null) {
                 //Get all tokens available in line
                 String[] tokens = line.split(COMMA_DELIMITER);
-                Log.d("TOKENS", Arrays.toString(tokens));
+                Log.d(TAG, Arrays.toString(tokens));
                 LocationIDObject cachedLocationID = new LocationIDObject();
                 if (tokens.length > 0) {
                     //Create a new student object and fill his data

@@ -1,47 +1,31 @@
 package com.sci2015fair.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.androidplot.ui.DynamicTableModel;
-import com.androidplot.ui.SizeLayoutType;
 import com.androidplot.xy.CatmullRomInterpolator;
 import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.PointLabelFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
-import com.androidplot.xy.XYSeriesFormatter;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
 import com.sci2015fair.fileoperations.ReverseLineInputStream;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -164,7 +148,7 @@ public class StatsSummaryFragment extends Fragment {
                         +emotion.get(4).get(j).doubleValue()*1;
             }
             SimpleXYSeries avg = new SimpleXYSeries(Arrays.asList(avgE),
-                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Average");
+                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Average Activation");
             LineAndPointFormatter lf = new LineAndPointFormatter(rainbow[0], // line color
                     rainbow[0], // point color
                     Color.argb(0,0,0,0), // fill
@@ -173,13 +157,16 @@ public class StatsSummaryFragment extends Fragment {
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
             plot.addSeries(avg,lf);
 
+            //moving average
+
+
             //movement line
             Number[] xaxis = new Number[7];
             for(int q = 0; q<7; q++)
                 xaxis[q] = (double)(q*emotion.get(0).size())/7.0;
 
             SimpleXYSeries movement = new SimpleXYSeries(Arrays.asList(xaxis),
-                    Arrays.asList(dist), "Distance");
+                    Arrays.asList(dist), "Distance (log)");
             LineAndPointFormatter lf2 = new LineAndPointFormatter(rainbow[1], // line color
                     rainbow[1], // point color
                     Color.argb(0,0,0,0), // fill
@@ -188,7 +175,7 @@ public class StatsSummaryFragment extends Fragment {
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
             plot.addSeries(movement, lf2);
 
-            plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 3));
+            plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 1));
             plot.setTicksPerRangeLabel(10);
         } catch (Exception e){
             e.printStackTrace();

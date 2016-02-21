@@ -135,7 +135,7 @@
         <service
             android:name=".distance.DistanceService"
             android:enabled="true"
-            android:process=":your_service" >
+            android:process=":distanceService" >
         </service>
 
         <meta-data

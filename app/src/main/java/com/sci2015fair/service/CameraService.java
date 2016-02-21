@@ -7,6 +7,7 @@ package com.sci2015fair.service;
  * TODO:
  * - fix Android 6.0+ screen permissions
  * - fix the setParameters call on certain phones
+ * - prevent this from causing the UI thread to hang in main app
  *
  * Derived from:
  * http://www.piwai.info/chatheads-basics/
