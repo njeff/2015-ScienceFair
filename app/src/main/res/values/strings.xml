@@ -17,7 +17,7 @@
     <string name="hello_world">Hello world!</string>
 
 <!-- TODO: Remove or change this placeholder text -->
-    <string name="home">Welcome! You can browse through more info by pulling up the right menu bar.</string>
+    <string name="home">Welcome! You can browse through more info by pulling up the left menu bar.</string>
     <string name="stats">Here will be some pretty visualizations of your mood over time!</string>
     <string name="title_activity_notifications">Notifications</string>
     <string name="title_activity_service_launcher">ServiceLauncherActivity</string>
