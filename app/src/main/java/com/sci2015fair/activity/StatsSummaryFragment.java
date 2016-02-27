@@ -128,8 +128,9 @@ public class StatsSummaryFragment extends Fragment {
                         emotion.get(j).add(Double.parseDouble(s[s.length-5+j]));
                 }
                 i--;
-                if(i<0||currentUT<oldtime) //read values up to the oldest date from the distance log
+                if(i<0||currentUT<oldtime) { //read values up to the oldest date from the distance log
                     break;
+                }
             }
             fileReader.close();
             for(int q = 0; q<5; q++) //flip around so most recent values on on the right of graph
