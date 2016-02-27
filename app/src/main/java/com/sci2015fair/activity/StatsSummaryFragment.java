@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.androidplot.ui.DynamicTableModel;
+import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.CatmullRomInterpolator;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
@@ -104,7 +105,7 @@ public class StatsSummaryFragment extends Fragment {
             while ((line = fileReader.readLine()) != null) {
                 String[] s = line.split(",");
                 if(!s[0].equals("Date")){
-                    dist[i] = Math.log10(Math.abs(Double.parseDouble(s[1])))/2.0; //get the delta or dist
+                    dist[i] = Math.log10(Math.abs(Double.parseDouble(s[1])))/6.0; //get the delta or dist
                     oldestdate = s[0]; //record oldest date
                 }
                 i--;
@@ -120,16 +121,27 @@ public class StatsSummaryFragment extends Fragment {
             fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
             i = samples-1;
             long currentUT = 0;
+            boolean avgflag = false;
+            int avgVal = 0;
             while ((line = fileReader.readLine()) != null) {
                 String[] s = line.split(",");
-                if(!s[0].equals("ID")){
-                    currentUT = dfm.parse(s[1]).getTime(); //unix time * 1000
+                if(avgflag){
                     for(int j = 0; j<5; j++)
                         emotion.get(j).add(Double.parseDouble(s[s.length-5+j]));
-                }
-                i--;
-                if(i<0||currentUT<oldtime) { //read values up to the oldest date from the distance log
-                    break;
+                    avgVal++;
+                    if(avgVal==14){ //weighted average of the last n points
+                        break;
+                    }
+                } else {
+                    if(!s[0].equals("ID")){
+                        currentUT = dfm.parse(s[1]).getTime(); //unix time * 1000
+                        for(int j = 0; j<5; j++)
+                            emotion.get(j).add(Double.parseDouble(s[s.length-5+j]));
+                    }
+                    i--;
+                    if(i<0||currentUT<oldtime) { //read values up to the oldest date from the distance log
+                        avgflag = true;
+                    }
                 }
             }
             fileReader.close();
@@ -141,13 +153,14 @@ public class StatsSummaryFragment extends Fragment {
 
             //averaged line
             Number[] avgE = new Number[emotion.get(0).size()];
-            for(int j =0; j<emotion.get(0).size(); j++){ //weighted average line
+            for(int j = 0; j<emotion.get(0).size(); j++){ //weighted average line
                 avgE[j] = emotion.get(0).get(j).doubleValue()*0.9
                         +emotion.get(1).get(j).doubleValue()*0.5
                         +emotion.get(2).get(j).doubleValue()*0.1
                         +emotion.get(3).get(j).doubleValue()*0.2
                         +emotion.get(4).get(j).doubleValue()*1;
             }
+            /*
             SimpleXYSeries avg = new SimpleXYSeries(Arrays.asList(avgE),
                     SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Average Activation");
             LineAndPointFormatter lf = new LineAndPointFormatter(rainbow[0], // line color
@@ -157,14 +170,31 @@ public class StatsSummaryFragment extends Fragment {
             lf.setInterpolationParams( //smoothing
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
             plot.addSeries(avg,lf);
+            */
 
             //moving average
-
+            Number[] movingAvg = new Number[emotion.get(0).size()-avgVal];
+            for(int j = avgVal; j<emotion.get(0).size(); j++){ //calculate average
+                movingAvg[j-avgVal] = 0;
+                for(int k = 0; k < avgVal; k++){
+                    movingAvg[j-avgVal] = movingAvg[j-avgVal].doubleValue() + avgE[j-k].doubleValue();
+                }
+                movingAvg[j-avgVal] = movingAvg[j-avgVal].doubleValue()/(double)avgVal;
+            }
+            SimpleXYSeries mAvg = new SimpleXYSeries(Arrays.asList(movingAvg),
+                    SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Moving Average");
+            LineAndPointFormatter lpf = new LineAndPointFormatter(rainbow[2], // line color
+                    rainbow[0], // point color
+                    Color.argb(0,0,0,0), // fill
+                    null);
+            lpf.setInterpolationParams( //smoothing
+                    new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
+            plot.addSeries(mAvg,lpf);
 
             //movement line
             Number[] xaxis = new Number[7];
             for(int q = 0; q<7; q++)
-                xaxis[q] = (double)(q*emotion.get(0).size())/7.0;
+                xaxis[q] = (double)(q*emotion.get(0).size()-avgVal)/7.0;
 
             SimpleXYSeries movement = new SimpleXYSeries(Arrays.asList(xaxis),
                     Arrays.asList(dist), "Distance (log)");
@@ -175,9 +205,14 @@ public class StatsSummaryFragment extends Fragment {
             lf2.setInterpolationParams( //smoothing
                     new CatmullRomInterpolator.Params(7, CatmullRomInterpolator.Type.Centripetal));
             plot.addSeries(movement, lf2);
-
+            //legend
             plot.getLegendWidget().setTableModel(new DynamicTableModel(2, 1));
+            //range adjustment
+            plot.setRangeBoundaries(0, 1.3, BoundaryMode.FIXED);
+            plot.setRangeStepValue(10);
             plot.setTicksPerRangeLabel(10);
+            plot.getLayoutManager().remove(plot.getDomainLabelWidget());
+            plot.getLayoutManager().remove(plot.getRangeLabelWidget());
         } catch (Exception e){
             e.printStackTrace();
         }

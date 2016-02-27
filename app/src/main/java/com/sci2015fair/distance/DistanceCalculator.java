@@ -49,7 +49,7 @@ public class DistanceCalculator extends WakefulBroadcastReceiver{
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         // adjust time here
         // update distance every (12) hours
-        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pi);
+        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_HALF_DAY, pi);
     }
 
     public void CancelAlarm(Context context)

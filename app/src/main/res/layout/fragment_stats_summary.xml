@@ -1,22 +1,29 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:ap="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.sci2015fair.activity.StatsSummaryFragment"
-    android:id="@+id/statslayout"
-    android:background="#ffffff">
+    android:id="@+id/statslayout">
 
-    <!-- TODO: Update blank fragment layout
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/stats" />
-    -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mood and Distance Plot\nShowing the last 7 days:"
+        android:textSize="18dp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"/>
+
     <com.androidplot.xy.XYPlot
         android:id="@+id/plot"
         android:layout_width="fill_parent"
-        android:layout_height="491dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         ap:labelTextColor="#111111"
-        ap:label="Mood Plot"
         ap:rangeLabel="Mood"
         ap:domainLabel="Time"
         ap:borderColor="#FFFFFF"
@@ -50,4 +57,4 @@
         ap:legendAnchorPosition="right_bottom"
         android:layout_gravity="center" />
 
-</FrameLayout>
+</LinearLayout>

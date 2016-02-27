@@ -80,7 +80,7 @@ public class MapsFragment extends Fragment {
                 days++;
             }
             j = i;
-            if(days == 5) //show the last five day's worth of data
+            if(days == 7) //show the last seven day's worth of data
                 break;
         }
         CameraPosition cameraPosition = new CameraPosition.Builder()
