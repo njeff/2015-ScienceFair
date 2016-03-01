@@ -1,5 +1,6 @@
-package com.sci2015fair.service;
+package com.sci2015fair.notification;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,6 +13,10 @@ import android.util.Log;
 
 import com.sci2015fair.R;
 import com.sci2015fair.activity.MainActivity;
+import com.sci2015fair.activity.SurveyActivity;
+import com.sci2015fair.broadcastreceiver.AlarmReceiver;
+
+import java.util.Calendar;
 
 public class Notifications extends Service {
     public Notifications() {
@@ -23,10 +28,18 @@ public class Notifications extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    @Override
     public void onCreate()
     {
         super.onCreate();
         notifyUser(getApplicationContext());
+    //    scheduleServiceUpdates(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        notifyUser(getApplicationContext());
+        return 0;
     }
 
     protected void notifyUser(Context context) {
@@ -34,10 +47,12 @@ public class Notifications extends Service {
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.notification_icon)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
+                        .setContentTitle("App")
+                        .setContentText("Survey required today.");
         // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, SurveyActivity.class);
+//        Intent intent = new Intent(this, .class);
+//        this.startActivity(intent);
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
@@ -53,5 +68,19 @@ public class Notifications extends Service {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
         mNotificationManager.notify(0, mBuilder.build());
+
+       // createAlarm(context);
     }
+
+    public void createAlarm(Context context) {
+        Intent myIntent = new Intent(context, Notifications.class);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(context, 0, myIntent, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 10000 , pendingIntent);  //set repeating every 24 hours
+    }
+
 }

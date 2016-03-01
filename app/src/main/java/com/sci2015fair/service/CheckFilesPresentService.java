@@ -20,6 +20,7 @@ public class CheckFilesPresentService extends Service {
     private static final File mainExternalFolder = SaveLocations.mainExternalFolder;
     private static final File dataFolder = SaveLocations.dataFolder;
     private static final File pictureFolder = SaveLocations.pictureFolder;
+    private static final File DFSurveyLogCSV = SaveLocations.DFSurveyLogCSV;
     private static final File DFConsoleLogCSV = SaveLocations.DFConsoleLogCSV;
     private static final File DFLocationGPSLogCSV = SaveLocations.DFLocationGPSLogCSV;
     private static final File DFPedometerTrackingLogTXT = SaveLocations.DFPedometerTrackingLogTXT;
@@ -110,9 +111,24 @@ public class CheckFilesPresentService extends Service {
     }
 
     public static void checkDFContents() {
+        checkDFSurveyLogCSV();
         checkDFConsoleLogCSVFile();
         checkDFLocationGPSLogCSV();
         checkDFPedometerTrackingLogTXT();
+    }
+
+    public static void checkDFSurveyLogCSV() {
+        if (DFSurveyLogCSV.exists()) {
+            Log.d("CheckFilesPresentServ", "\"" + DFSurveyLogCSV.getPath() + "\" file found.");
+        } else {
+            try {
+                DFSurveyLogCSV.createNewFile();
+                Log.d("CheckFilesPresentServ", "\"" + DFSurveyLogCSV.getPath() + "\" file not found.  File has been created.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        toBeScanned.add(DFSurveyLogCSV.getAbsolutePath());
     }
 
     public static void checkDFConsoleLogCSVFile() {

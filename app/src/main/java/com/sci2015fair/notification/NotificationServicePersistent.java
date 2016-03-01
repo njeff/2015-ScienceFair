@@ -1,4 +1,4 @@
-package com.sci2015fair.service;
+package com.sci2015fair.notification;
 
 import android.app.IntentService;
 import android.content.Intent;

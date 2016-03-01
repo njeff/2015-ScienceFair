@@ -45,9 +45,6 @@ public class MainActivity extends AppCompatActivity{
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
-//        Intent intent = new Intent(this, MapsActivity.class);
-//        this.startActivity(intent);
     }
 
     @Override

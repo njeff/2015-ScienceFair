@@ -13,6 +13,7 @@ public class SaveLocations {
     public static final File dataFolder = new File(mainExternalFolder, "/Data");
     public static final File pictureFolder = new File(Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_PICTURES), "2015-ScienceFair");
+    public static final File DFSurveyLogCSV = new File(dataFolder, "surveylog.csv");
     public static final File DFConsoleLogCSV = new File(dataFolder, "consolelog.csv");
     public static final File DFLocationGPSLogCSV = new File(dataFolder, "locationgpslog.csv");
     public static final File DFPedometerTrackingLogTXT = new File(dataFolder, "pedometertrackinglog.txt");

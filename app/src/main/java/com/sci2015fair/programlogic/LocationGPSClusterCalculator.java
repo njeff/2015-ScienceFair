@@ -21,27 +21,53 @@ public class LocationGPSClusterCalculator {
 //    }
 //
 //    public static void findClusters() {
-//        ArrayList<LocationIDObject> allLocationData = new ArrayList<>(readLocationCSVFile(SaveLocations.DFLocationGPSLogCSV));
+//        ArrayList<LocationIDObject> allLocationData = new ArrayList<>(readLocationCSVFile(SaveLocations.DFLocationGPSLogCSV));//load all location data recorded in locationgpslog.csv into a LocationIDObject array
 //        String primerDate = allLocationData.get(0).getDate();
 //        int initialDayIndex = 0;
 //        int finalDayIndex = 0;
 //        int i;
-//        for (i = 0; i < allLocationData.size(); i++) {
+//        for (i = 0; i < allLocationData.size(); i++) {//finds first index with date specified in primerDate
 //            if (allLocationData.get(i).getDate().equals(primerDate)) {
 //                initialDayIndex = i;
 //                break;
 //            }
 //        }
-//        for ( ;i < allLocationData.size(); i++) {
+//
+//        for ( ;i < allLocationData.size(); i++) {//finds first index of the day after the specified primerDate
 //
 //            if (allLocationData.get(i).getDate().equals(addOneDay(primerDate))) {
 //                finalDayIndex = i;
 //            }
 //        }
 //
-//        LocationIDObject[] singleDayLocationData = new LocationIDObject[finalDayIndex - initialDayIndex + 1];
+//        LocationIDObject[] singleDayLocationData = new LocationIDObject[finalDayIndex - initialDayIndex + 1];//create an array of LocationIDObjects from just one day
+//        Location[] locationCache = new Location[10];
+//        int outOfClusterCount = 0;
+////        double lat = 0;
+////        double longt = 0;
+//        double dist
+//        for (int j = 0; j < singleDayLocationData.length; j++) {
+////            lat = singleDayLocationData[i].getLocation().getLatitude();
+////            longt = singleDayLocationData[i].getLocation().getLongitude();
+//            for (int k = 1; k < locationCache.length; k++) {
+//                locationCache[k] = locationCache[k - 1];
+//            }
+//            locationCache[0] = singleDayLocationData[j].getLocation();
+//
+//
+//
+//        }
+//
+//
+//
+//
+//
+//
+//
 //        (allLocationData.subList(initialDayIndex, finalDayIndex + 1)).toArray(singleDayLocationData);
 //        LocationIDObject[][] singleDayInTimeBlocks = new LocationIDObject[12][];
+//
+//
 //        String[] idTimeAnchors = {"0:00:00", "2:00:00", "4:00:00", "6:00:00", "8:00:00", "10:00:00", "12:00:00", "14:00:00", "16:00:00", "18:00:00", "20:00:00", "22:00:00"};//military time without separating colons (due to int form being easier to compare).  i.e. "20000" is 2:00:00 AM, etc.
 //
 //        String[] idTimeBounds = {"1:00:00", "3:00:00", "5:00:00", "7:00:00", "9:00:00", "11:00:00", "13:00:00", "15:00:00", "17:00:00", "19:00:00", "21:00:00", "23:00:00"};

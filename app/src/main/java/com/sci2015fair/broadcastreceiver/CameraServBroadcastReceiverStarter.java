@@ -1,4 +1,4 @@
-package com.sci2015fair.service;
+package com.sci2015fair.broadcastreceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,7 +22,7 @@ public class CameraServBroadcastReceiverStarter extends BroadcastReceiver{
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) ||//has the phone's boot sequence completed?
                 intent.getAction().equals(Intent.ACTION_USER_PRESENT))//have we logged in?
         {
-//            Intent camServ = new Intent(context, com.sci2015fair.service.Notifications.class);//create intent
+//            Intent camServ = new Intent(context, com.sci2015fair.notification.Notifications.class);//create intent
 //            Intent camServ = new Intent(context, CameraService.class);//create intent
 //            context.startService(camServ);//start CameraService
 

@@ -113,7 +113,7 @@ public class CameraService extends Service {
         cameraheightres = sizes.get(0).height;
         camerawidthres = sizes.get(0).width;
         cParams.setPictureSize(camerawidthres, cameraheightres); //use largest resolution possible
-        mCamera.setParameters(cParams);
+        mCamera.setParameters(cParams);//enable or disable depending on phone
 
         mPreview = new CameraPreview(this, mCamera);
         windowManager.addView(mPreview, params);

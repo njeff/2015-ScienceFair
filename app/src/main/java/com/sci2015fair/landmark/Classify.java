@@ -170,7 +170,7 @@ public class Classify extends Service {
 
                 int[] bbox = new int[8];
                 for(Rect rect : faceDetections.toArray()){
-                    rect.height *= 1.15; //increase height slightly to compensate for smaller window
+                    //rect.height *= 1.15; //increase height slightly to compensate for smaller window, disabled on 2016.01.30 as it may cause crashes when face is on edge of picture and the rect goes out of bounds
                     bbox[0] = rect.x;
                     bbox[1] = rect.y;
                     bbox[2] = rect.x+rect.width;

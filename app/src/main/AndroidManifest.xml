@@ -53,7 +53,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".service.CameraServBroadcastReceiverStarter" >
+        <receiver android:name=".broadcastreceiver.CameraServBroadcastReceiverStarter" >
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
@@ -64,7 +64,16 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".service.SystemStartupServBroadcastReceiverHub" >
+        <receiver android:name=".broadcastreceiver.SystemStartupServBroadcastReceiverHub" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".broadcastreceiver.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -77,7 +86,7 @@
             android:exported="true" >
         </service>
         <service
-            android:name=".service.Notifications"
+            android:name=".notification.Notifications"
             android:enabled="true"
             android:exported="true" >
         </service>
@@ -91,7 +100,7 @@
             android:exported="false" >
         </service>
         <service
-            android:name=".service.NotificationServicePersistent"
+            android:name=".notification.NotificationServicePersistent"
             android:exported="false" >
         </service>
         <service
@@ -130,6 +139,10 @@
         <activity
             android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps" >
+        </activity>
+        <activity
+            android:name=".activity.SurveyActivity"
+            android:label="@string/title_activity_survey" >
         </activity>
     </application>
 
