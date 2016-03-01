@@ -41,7 +41,7 @@ public class SystemStartupServBroadcastReceiverHub extends BroadcastReceiver {
 //            throw new UnsupportedOperationException("Not yet implemented");
 //
 //
-//
+           context.startService(new Intent(context, Notifications.class));
 //
 //
 ////            Intent camServ = new Intent(context, com.sci2015fair.notification.Notifications.class);//create intent

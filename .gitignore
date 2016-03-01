@@ -9,3 +9,4 @@ app/src/main/jniLibs
 app/src/main/libs
 app/src/main/obj
 openCVLibrary300/build
+app/src/debug/res/values/google_maps_api.xml

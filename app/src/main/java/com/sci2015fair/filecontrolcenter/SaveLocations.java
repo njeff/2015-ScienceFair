@@ -16,6 +16,7 @@ public class SaveLocations {
     public static final File DFSurveyLogCSV = new File(dataFolder, "surveylog.csv");
     public static final File DFConsoleLogCSV = new File(dataFolder, "consolelog.csv");
     public static final File DFLocationGPSLogCSV = new File(dataFolder, "locationgpslog.csv");
+    public static final File TotalDistanceLog = new File(dataFolder, "totaldistance.csv");
     public static final File DFPedometerTrackingLogTXT = new File(dataFolder, "pedometertrackinglog.txt");
     public static final File expressionCSV = new File(dataFolder, "expression.csv");
     public static final File model = new File(dataFolder, "m.model");

@@ -1,12 +1,16 @@
 package com.sci2015fair.activity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.sci2015fair.R;
 
@@ -65,7 +69,32 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        Switch developer = (Switch)v.findViewById(R.id.developerMode);
+
+        SharedPreferences settings = getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        boolean develop = settings.getBoolean("developerMode", false);
+        developer.setChecked(develop);
+
+        developer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.v("Switch State=", "" + isChecked);
+                SharedPreferences settings = getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = settings.edit();
+
+                if(isChecked){
+                    editor.putBoolean("developerMode", true);
+                } else {
+                    editor.putBoolean("developerMode", false);
+                }
+                editor.commit();
+            }
+
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

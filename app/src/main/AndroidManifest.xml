@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 
     <!-- My Location -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -64,6 +65,7 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".broadcastreceiver.SystemStartupServBroadcastReceiverHub" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -74,6 +76,20 @@
             android:name=".broadcastreceiver.AlarmReceiver"
             android:enabled="true"
             android:exported="true" >
+        </receiver>
+        <receiver android:name=".distance.AutoStart">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".distance.DistanceCalculator" android:process=":remote" android:exported="true">
+            <intent-filter>
+                <action android:name="distance.START_ALARM" >
+                </action>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".service.SystemStartupServBroadcastReceiverHub" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -127,6 +143,11 @@
             android:name=".fileoperations.ScanMediaService"
             android:enabled="true"
             android:exported="true" >
+        </service>
+        <service
+            android:name=".distance.DistanceService"
+            android:enabled="true"
+            android:process=":distanceService" >
         </service>
 
         <meta-data

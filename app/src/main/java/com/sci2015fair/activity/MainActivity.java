@@ -2,6 +2,7 @@ package com.sci2015fair.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,7 +18,17 @@ import android.view.ViewGroup;
 
 import com.sci2015fair.R;
 
+import com.sci2015fair.distance.LocationIDObject;
+import com.sci2015fair.filecontrolcenter.SaveLocations;
 import com.sci2015fair.service.CameraService;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import static com.sci2015fair.fileoperations.LocationGPSLogCSVReader.readLocationCSVFile;
 
 public class MainActivity extends AppCompatActivity{
 

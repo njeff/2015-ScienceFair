@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
  * Created by Jeffrey on 1/9/2016.
  */
 public class ExpressionCSV {
-    private static String header = "ID,Date,Time,Predicted,Happy,Neutral,Sad,Sleepy,Surprised,Fear,Anger";
+    private static String header = "id,Date,Time,Predicted,Happy,Neutral,Sad,Sleepy,Surprised,Fear,Anger";
     private static String TAG = "ExpCSV";
 
     /**

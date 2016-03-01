@@ -19,10 +19,12 @@ import android.widget.TextView;
 import com.google.android.gms.vision.Frame;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
+import com.sci2015fair.fileoperations.ReverseLineInputStream;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,8 +86,8 @@ public class ConsoleLogFragment extends Fragment {
         TableLayout t = (TableLayout)view.findViewById(R.id.logtable);
         t.removeAllViews();
         try{
-            //read first 25 lines of the log
-            BufferedReader fileReader = new BufferedReader(new FileReader(SaveLocations.DFConsoleLogCSV));
+            //read last 25 lines of the log
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(SaveLocations.expressionCSV)));
             int i = 0;
             String line;
             TableRow.LayoutParams param = new TableRow.LayoutParams(
@@ -98,7 +100,7 @@ public class ConsoleLogFragment extends Fragment {
                 tr.setId(i);
                 tr.setLayoutParams(param);
 
-                for(int j = 0; j<3; j++){
+                for(int j = 0; j<4; j++){
                     TextView tv = new TextView(getContext());
                     tv.setId(j*2);
                     tv.setText(s[j]);

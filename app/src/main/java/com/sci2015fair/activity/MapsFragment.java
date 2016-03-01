@@ -1,7 +1,6 @@
 package com.sci2015fair.activity;
 
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,10 +18,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sci2015fair.R;
 import com.sci2015fair.filecontrolcenter.SaveLocations;
-import com.sci2015fair.programlogic.LocationIDObject;
+import com.sci2015fair.distance.LocationIDObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static com.sci2015fair.fileoperations.LocationGPSLogCSVReader.readLocationCSVFile;
 
@@ -33,6 +31,7 @@ public class MapsFragment extends Fragment {
 
     MapView mMapView;
     private GoogleMap googleMap;
+    private static String TAG = "Maps";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,28 +63,25 @@ public class MapsFragment extends Fragment {
         marker.icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
 
-//        // adding marker
-//        googleMap.addMarker(marker);
-//        CameraPosition cameraPosition = new CameraPosition.Builder()
-//                .target(new LatLng(17.385044, 78.486671)).zoom(12).build();
-//        googleMap.animateCamera(CameraUpdateFactory
-//                .newCameraPosition(cameraPosition));
-
-        // adding marker
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(new LatLng(10, 10))
-//                .title("Hello world"));
         ArrayList<LocationIDObject> allLocationData = new ArrayList<>(readLocationCSVFile(SaveLocations.DFLocationGPSLogCSV));
-        for (int i = 0; i < allLocationData.size(); i++) {
-            Log.d("ARRAYLIST", allLocationData.get(i).getLocation().getLatitude() + ", " + allLocationData.get(i).getLocation().getLongitude());
-        }
+        //for (int i = 0; i < allLocationData.size(); i++) {
+        //    Log.d("ARRAYLIST", allLocationData.get(i).getLocation().getLatitude() + ", " + allLocationData.get(i).getLocation().getLongitude());
+        //}
         int j = 0;
-        for (int i = 0; i < allLocationData.size(); i++) {
+        int days = 0;
+        String previousday = allLocationData.get(allLocationData.size()-1).getDate();
+        for (int i = allLocationData.size()-1; i >= 0; i--) {
             googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(allLocationData.get(i).getLocation().getLatitude(), allLocationData.get(i).getLocation().getLongitude()))
                     .title(allLocationData.get(i).getLocation().getLatitude() + ", " + allLocationData.get(i).getLocation().getLongitude()));
-            Log.d("coord", allLocationData.get(i).getLocation().getLatitude() + ", " + allLocationData.get(i).getLocation().getLongitude());
+            Log.d(TAG, allLocationData.get(i).getLocation().getLatitude() + ", " + allLocationData.get(i).getLocation().getLongitude());
+            if(!previousday.equals(allLocationData.get(i).getDate())){
+                previousday = allLocationData.get(i).getDate();
+                days++;
+            }
             j = i;
+            if(days == 7) //show the last seven day's worth of data
+                break;
         }
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(allLocationData.get(j).getLocation().getLatitude(), allLocationData.get(j).getLocation().getLongitude())).zoom(12).build();

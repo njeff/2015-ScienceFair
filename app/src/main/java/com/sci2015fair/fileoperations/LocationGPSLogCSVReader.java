@@ -1,11 +1,9 @@
 package com.sci2015fair.fileoperations;
 
 import android.location.Location;
-import android.os.Environment;
 import android.util.Log;
 
-import com.sci2015fair.filecontrolcenter.SaveLocations;
-import com.sci2015fair.programlogic.LocationIDObject;
+import com.sci2015fair.distance.LocationIDObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,14 +13,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Mitchell on 12/30/2015.
  */
 public class LocationGPSLogCSVReader {
+    private static String TAG = "GPSCSV";
     private static final String COMMA_DELIMITER = ",";
     public static ArrayList<LocationIDObject> readLocationCSVFile(File fileToRead) {
         String line;
@@ -40,7 +37,7 @@ public class LocationGPSLogCSVReader {
             while ((line = fileReader.readLine()) != null) {
                 //Get all tokens available in line
                 String[] tokens = line.split(COMMA_DELIMITER);
-                Log.d("TOKENS", Arrays.toString(tokens));
+                Log.d(TAG, Arrays.toString(tokens));
                 LocationIDObject cachedLocationID = new LocationIDObject();
                 if (tokens.length > 0) {
                     //Create a new student object and fill his data
