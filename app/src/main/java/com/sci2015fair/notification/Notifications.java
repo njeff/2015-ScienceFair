@@ -47,7 +47,7 @@ public class Notifications extends Service {
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.notification_icon)
-                        .setContentTitle("App")
+                        .setContentTitle(getResources().getString(R.string.app_name))
                         .setContentText("Survey required today.");
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(context, SurveyActivity.class);
